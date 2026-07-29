@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react';
+import { Input } from './ui/input';
 
 export function SearchBar() {
   return (
@@ -7,10 +8,10 @@ export function SearchBar() {
         className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
         size={20}
       />
-      <input
+      <Input
         type="text"
-        placeholder="Search for a location"
-        className="w-full rounded-full bg-card py-2 pl-12 pr-4 text-foreground shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        placeholder="Search for a location..."
+        className="h-12 rounded-full bg-card pl-12 pr-4 text-base shadow-sm"
       />
     </div>
   );
