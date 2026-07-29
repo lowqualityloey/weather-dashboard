@@ -19,6 +19,7 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
+  "tsconfig": "tsconfig.app.json",
   "menuColor": "default",
   "menuAccent": "subtle",
   "registries": {}
