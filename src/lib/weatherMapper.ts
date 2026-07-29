@@ -48,7 +48,11 @@ export function mapDaily(daily: DailyWeather[]): MappedDaily[] {
   }));
 }
 
-export function mapHourly(hourly: HourlyWeather[], date: Date, timezoneOffset: number): MappedHourly[] {
+export function mapHourly(
+  hourly: HourlyWeather[],
+  date: Date,
+  timezoneOffset: number,
+): MappedHourly[] {
   const targetDate = new Date((date.getTime() / 1000 + timezoneOffset) * 1000);
   const targetDay = targetDate.getUTCDate();
 
