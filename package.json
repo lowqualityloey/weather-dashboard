@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:agents": "python3 .agents/scripts/validate_kit.py",
+    "checklist": "python3 .agents/scripts/checklist.py ."
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
