@@ -1,6 +1,7 @@
 # Agent Instructions
 
 ## PromptKit Quick Reference
+
 - Review the available artefacts when the student requests them:
   - Protocol: `promptkit/protocols/setup.md` — instructions for updating these CLI briefings.
   - Workflow: `promptkit/workflows/tutor.md` — guide for tutoring/explanation sessions.

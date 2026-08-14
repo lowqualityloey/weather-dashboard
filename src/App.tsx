@@ -1,4 +1,3 @@
-
 import { SearchBar } from './components/SearchBar';
 import { Sidebar } from './components/Sidebar';
 
