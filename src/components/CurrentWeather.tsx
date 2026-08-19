@@ -21,11 +21,7 @@ export default function CurrentWeather({ data, cityName }: CurrentWeatherProps) 
       <CardContent>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img
-              src={getIconUrl(data.icon)}
-              alt={data.description}
-              className="h-24 w-24"
-            />
+            <img src={getIconUrl(data.icon)} alt={data.description} className="h-24 w-24" />
             <div>
               <div className="text-5xl font-bold">{data.temp}°</div>
               <div className="text-lg">{data.description}</div>
@@ -39,7 +35,9 @@ export default function CurrentWeather({ data, cityName }: CurrentWeatherProps) 
                 className="h-4 w-4 fill-current transition-transform duration-300"
                 style={{ transform: `rotate(${data.windDeg}deg)` }}
               />
-              <span>{getWindDirection(data.windDeg)} ({data.windSpeed} km/h)</span>
+              <span>
+                {getWindDirection(data.windDeg)} ({data.windSpeed} km/h)
+              </span>
             </div>
           </div>
         </div>
