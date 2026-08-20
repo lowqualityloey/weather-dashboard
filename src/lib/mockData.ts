@@ -48,4 +48,36 @@ export const mockDaily: MappedDaily[] = [
   },
 ];
 
-export const mockHourly: MappedHourly[] = [];
+export const mockHourly: MappedHourly[] = [
+  {
+    dt: 1678908000,
+    temp: 16,
+    description: 'Light Rain',
+    icon: '10d',
+  },
+  {
+    dt: 1678918800,
+    temp: 22,
+    description: 'Mostly sunny',
+    icon: '02d',
+  },
+  {
+    dt: 1678929600,
+    temp: 20,
+    description: 'Scattered clouds',
+    icon: '03d',
+  },
+  {
+    dt: 1678940400,
+    temp: 28,
+    description: 'Sunny',
+    icon: '01d',
+  },
+
+  {
+    dt: 1678962000,
+    temp: 17,
+    description: 'Broken clouds',
+    icon: '04d',
+  },
+];

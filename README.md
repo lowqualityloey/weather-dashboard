@@ -17,19 +17,19 @@ A responsive weather dashboard built with React and TypeScript as a refresher pr
 ### Core Features
 
 - [ ] Search for a city using the OpenWeather Geocoding API
-- [ ] View current weather conditions
+- [x] View current weather conditions
   - Temperature
   - "Feels like" temperature
   - Weather condition and icon
   - Humidity
   - Wind speed and direction
-- [ ] View a five-day forecast
-- [ ] Expand a forecast day to view weather at three-hour intervals
+- [x] View a five-day forecast
+- [x] Expand a forecast day to view weather at three-hour intervals
 - [ ] Save and remove favourite cities
 - [ ] Persist saved cities with `localStorage`
 - [ ] Toggle between light and dark themes
-- [ ] Responsive desktop and mobile layouts
-- [ ] Use metric units: Celsius and kilometres per hour
+- [x] Responsive desktop and mobile layouts
+- [x] Use metric units: Celsius and kilometres per hour
 
 ### Stretch Features
 
@@ -232,7 +232,7 @@ Component configuration is in `components.json` (points to `tsconfig.app.json` f
 - [x] Build OpenWeather API service and TypeScript types
 - [x] Add data mappers and weather icon helpers
 - [x] Install UI component primitives (Button, Card, Input, Label, Badge, Switch, Collapsible)
-- [ ] Build the static dashboard using mock data
+- [x] Build the static dashboard using mock data
 - [ ] Add forecast accordion and theme toggle interactions
 - [ ] Connect city search and live weather data
 - [ ] Add saved cities with `localStorage`

@@ -1,7 +1,7 @@
 import { SearchBar } from './components/SearchBar';
 import { Sidebar } from './components/Sidebar';
 
-import { mockCurrent, mockDaily } from './lib/mockData';
+import { mockCurrent, mockDaily, mockHourly } from './lib/mockData';
 import CurrentWeather from './components/CurrentWeather';
 import ForecastList from './components/ForecastList';
 
@@ -12,7 +12,7 @@ function App() {
       <main id="main-content" className="relative flex-1 p-6 space-y-6">
         <SearchBar />
         <CurrentWeather data={mockCurrent} />
-        <ForecastList daily={mockDaily} />
+        <ForecastList daily={mockDaily} hourly={mockHourly} />
       </main>
     </div>
   );
