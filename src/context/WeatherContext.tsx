@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { MappedCurrent, MappedDaily, MappedHourly } from '../lib/weatherMapper';
 import { geocodeCity, fetchWeather } from '../lib/openWeather';
 import { mapCurrent, mapDaily, mapHourly } from '../lib/weatherMapper';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 interface WeatherContextType {
   current: MappedCurrent | null;
@@ -11,8 +12,11 @@ interface WeatherContextType {
   selectedCity: string;
   isLoading: boolean;
   error: string | null;
+  savedCities: string[];
   searchCity: (city: string) => Promise<void>;
   clearError: () => void;
+  addSavedCity: (city: string) => void;
+  removeSavedCity: (city: string) => void;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -25,11 +29,28 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [savedCities, setSavedCities] = useLocalStorage<string[]>('weather_saved_cities', [
+    'Taupō',
+    'Auckland',
+    'Wellington',
+  ]);
+
   const clearError = () => setError(null);
+
+  const addSavedCity = (city: string) => {
+    setSavedCities((prev) =>
+      prev.some((c) => c.toLowerCase() === city.toLowerCase()) ? prev : [...prev, city],
+    );
+  };
+
+  const removeSavedCity = (city: string) => {
+    setSavedCities((prev) => prev.filter((c) => c.toLowerCase() !== city.toLowerCase()));
+  };
 
   const searchCity = async (city: string) => {
     setIsLoading(true);
     setError(null);
+
     try {
       const locations = await geocodeCity(city);
       if (!locations.length) {
@@ -61,8 +82,11 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
         selectedCity,
         isLoading,
         error,
+        savedCities,
         searchCity,
         clearError,
+        addSavedCity,
+        removeSavedCity,
       }}
     >
       {children}
