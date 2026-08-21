@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { MappedCurrent, MappedDaily, MappedHourly } from '../lib/weatherMapper';
-import { geocodeCity, fetchWeather } from '../lib/openWeather';
+import { geocodeCity, fetchWeather, reverseGeocode } from '../lib/openWeather';
 import { mapCurrent, mapDaily, mapHourly } from '../lib/weatherMapper';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
@@ -17,6 +17,8 @@ interface WeatherContextType {
   clearError: () => void;
   addSavedCity: (city: string) => void;
   removeSavedCity: (city: string) => void;
+  fetchCurrentLocation: () => void;
+  fetchWeatherByCoords: (lat: number, lon: number, cityName?: string) => Promise<void>;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -45,6 +47,55 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
 
   const removeSavedCity = (city: string) => {
     setSavedCities((prev) => prev.filter((c) => c.toLowerCase() !== city.toLowerCase()));
+  };
+
+  const fetchWeatherByCoords = async (lat: number, lon: number, cityName?: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const name = cityName ?? (await reverseGeocode(lat, lon));
+      const weather = await fetchWeather(lat, lon);
+      setCurrent(mapCurrent(weather));
+      setDaily(mapDaily(weather.daily));
+      setHourly(mapHourly(weather.hourly, new Date(), weather.timezone_offset));
+      setSelectedCity(name);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        await fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
+      },
+      (err) => {
+        setIsLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setError(
+            'Location permission denied. Please allow location access or search manually.',
+          );
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setError('Location information is unavailable.');
+        } else if (err.code === err.TIMEOUT) {
+          setError('Location request timed out.');
+        } else {
+          setError('Failed to detect location.');
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: true },
+    );
   };
 
   const searchCity = async (city: string) => {
@@ -87,6 +138,8 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
         clearError,
         addSavedCity,
         removeSavedCity,
+        fetchCurrentLocation,
+        fetchWeatherByCoords,
       }}
     >
       {children}
