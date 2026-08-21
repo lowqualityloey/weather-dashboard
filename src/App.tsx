@@ -9,6 +9,8 @@ import ForecastList from './components/ForecastList';
 import { ThemeProvider } from './context/ThemeContext';
 import { ThemeToggle } from './components/ThemeToggle';
 import { MobileNav } from './components/MobileNav';
+import { WeatherSkeleton } from './components/WeatherSkeleton';
+import { ErrorAlert } from './components/ErrorAlert';
 
 function WeatherDashboard() {
   const { current, hourly, daily, selectedCity, isLoading, error } = useWeather();
@@ -23,10 +25,8 @@ function WeatherDashboard() {
         </div>
         <SearchBar />
 
-        {isLoading && (
-          <div className="text-muted-foreground text-center py-8">Loading weather data...</div>
-        )}
-        {error && <div className="text-destructive text-center py-8">{error}</div>}
+        {error && <ErrorAlert message={error} />}
+        {isLoading && <WeatherSkeleton />}
 
         {current && !isLoading && (
           <>
