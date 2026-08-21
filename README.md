@@ -27,7 +27,7 @@ A responsive weather dashboard built with React and TypeScript as a refresher pr
 - [x] Expand a forecast day to view weather at three-hour intervals
 - [x] Save and remove favourite cities
 - [x] Persist saved cities with `localStorage`
-- [ ] Toggle between light and dark themes
+- [x] Toggle between light and dark themes
 - [x] Responsive desktop and mobile layouts
 - [x] Use metric units: Celsius and kilometres per hour
 

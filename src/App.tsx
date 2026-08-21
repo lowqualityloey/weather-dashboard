@@ -6,6 +6,9 @@ import { Sidebar } from './components/Sidebar';
 import CurrentWeather from './components/CurrentWeather';
 import ForecastList from './components/ForecastList';
 
+import { ThemeProvider } from './context/ThemeContext';
+import { ThemeToggle } from './components/ThemeToggle';
+
 function WeatherDashboard() {
   const { current, hourly, daily, selectedCity, isLoading, error } = useWeather();
 
@@ -13,6 +16,9 @@ function WeatherDashboard() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <main id="main-content" className="relative flex-1 p-6 space-y-6">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
         <SearchBar />
 
         {isLoading && (
@@ -33,8 +39,10 @@ function WeatherDashboard() {
 
 export default function App() {
   return (
-    <WeatherProvider>
-      <WeatherDashboard />
-    </WeatherProvider>
+    <ThemeProvider>
+      <WeatherProvider>
+        <WeatherDashboard />
+      </WeatherProvider>
+    </ThemeProvider>
   );
 }
