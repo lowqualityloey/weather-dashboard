@@ -33,8 +33,8 @@ export function mapCurrent(data: WeatherData): MappedCurrent {
     humidity: current.humidity,
     windSpeed: Math.round(current.wind_speed * 3.6),
     windDeg: current.wind_deg,
-    description: current.weather[0].description,
-    icon: current.weather[0].icon,
+    description: current.weather[0]?.description ?? '',
+    icon: current.weather[0]?.icon ?? '01d',
   };
 }
 
@@ -43,8 +43,8 @@ export function mapDaily(daily: DailyWeather[]): MappedDaily[] {
     dt: d.dt,
     tempMin: Math.round(d.temp.min),
     tempMax: Math.round(d.temp.max),
-    description: d.weather[0].description,
-    icon: d.weather[0].icon,
+    description: d.weather[0]?.description ?? '',
+    icon: d.weather[0]?.icon ?? '01d',
   }));
 }
 

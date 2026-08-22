@@ -1,6 +1,7 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { MappedCurrent, MappedDaily, MappedHourly } from '../lib/weatherMapper';
+import type { WeatherData } from '../types/weather';
 import { geocodeCity, fetchWeather, reverseGeocode } from '../lib/openWeather';
 import { mapCurrent, mapDaily, mapHourly } from '../lib/weatherMapper';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -37,6 +38,9 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
     'Wellington',
   ]);
 
+  // Monotonic id so only the latest in-flight request can apply its result.
+  const requestRef = useRef(0);
+
   const clearError = () => setError(null);
 
   const addSavedCity = (city: string) => {
@@ -49,22 +53,35 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
     setSavedCities((prev) => prev.filter((c) => c.toLowerCase() !== city.toLowerCase()));
   };
 
-  const fetchWeatherByCoords = async (lat: number, lon: number, cityName?: string) => {
+  const applyWeather = (name: string, weather: WeatherData) => {
+    setCurrent(mapCurrent(weather));
+    setDaily(mapDaily(weather.daily));
+    setHourly(mapHourly(weather.hourly));
+    setSelectedCity(name);
+  };
+
+  const runWeatherRequest = async (work: () => Promise<{ name: string; weather: WeatherData }>) => {
+    const id = ++requestRef.current;
     setIsLoading(true);
     setError(null);
 
     try {
-      const name = cityName ?? (await reverseGeocode(lat, lon));
-      const weather = await fetchWeather(lat, lon);
-      setCurrent(mapCurrent(weather));
-      setDaily(mapDaily(weather.daily));
-      setHourly(mapHourly(weather.hourly));
-      setSelectedCity(name);
+      const { name, weather } = await work();
+      if (id !== requestRef.current) return; // stale response, discard
+      applyWeather(name, weather);
     } catch (err: unknown) {
+      if (id !== requestRef.current) return;
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
-      setIsLoading(false);
+      if (id === requestRef.current) setIsLoading(false);
     }
+  };
+
+  const fetchWeatherByCoords = async (lat: number, lon: number, cityName?: string) => {
+    await runWeatherRequest(async () => ({
+      name: cityName ?? (await reverseGeocode(lat, lon)),
+      weather: await fetchWeather(lat, lon),
+    }));
   };
 
   const fetchCurrentLocation = () => {
@@ -97,29 +114,22 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
   };
 
   const searchCity = async (city: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
+    await runWeatherRequest(async () => {
       const locations = await geocodeCity(city);
       if (!locations.length) {
         throw new Error('City not found');
       }
-      const weather = await fetchWeather(locations[0].lat, locations[0].lon);
-      setCurrent(mapCurrent(weather));
-      setDaily(mapDaily(weather.daily));
-      setHourly(mapHourly(weather.hourly));
-      setSelectedCity(locations[0].name);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+      return {
+        name: locations[0].name,
+        weather: await fetchWeather(locations[0].lat, locations[0].lon),
+      };
+    });
   };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void searchCity('Taupō');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
