@@ -10,6 +10,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { MobileNav } from './components/MobileNav';
 import { WeatherSkeleton } from './components/WeatherSkeleton';
 import { ErrorAlert } from './components/ErrorAlert';
+import { LiveAnnouncer } from './components/LiveAnnouncer';
 
 function WeatherDashboard() {
   const { current, hourly, daily, selectedCity, isLoading, error } = useWeather();
@@ -17,6 +18,7 @@ function WeatherDashboard() {
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
+      <LiveAnnouncer />
       <main id="main-content" className="relative flex-1 p-6 space-y-6">
         <MobileNav />
         <SearchBar />
