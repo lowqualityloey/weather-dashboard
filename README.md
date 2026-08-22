@@ -57,13 +57,10 @@ A high-performance, responsive Progressive Web App (PWA) built with React 19, Ty
 src/
 ├── components/
 │   ├── ui/                  # Base UI / shadcn accessible primitives
-│   │   ├── badge.tsx
 │   │   ├── button.tsx
 │   │   ├── card.tsx
-│   │   ├── collapsible.tsx
 │   │   ├── input.tsx
-│   │   ├── label.tsx
-│   │   └── switch.tsx
+│   │   └── label.tsx
 │   ├── CurrentWeather.tsx   # Hero weather card with favorite toggle & wind direction
 │   ├── ErrorAlert.tsx       # Dismissible alert banner
 │   ├── ForecastDay.tsx      # Individual daily forecast card

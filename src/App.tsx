@@ -2,7 +2,6 @@ import { WeatherProvider, useWeather } from './context/WeatherContext';
 import { SearchBar } from './components/SearchBar';
 import { Sidebar } from './components/Sidebar';
 
-//import { mockCurrent, mockDaily, mockHourly } from './lib/mockData';
 import CurrentWeather from './components/CurrentWeather';
 import ForecastList from './components/ForecastList';
 
