@@ -58,7 +58,7 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       const weather = await fetchWeather(lat, lon);
       setCurrent(mapCurrent(weather));
       setDaily(mapDaily(weather.daily));
-      setHourly(mapHourly(weather.hourly, new Date(), weather.timezone_offset));
+      setHourly(mapHourly(weather.hourly));
       setSelectedCity(name);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -110,7 +110,7 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       const weather = await fetchWeather(locations[0].lat, locations[0].lon);
       setCurrent(mapCurrent(weather));
       setDaily(mapDaily(weather.daily));
-      setHourly(mapHourly(weather.hourly, new Date(), weather.timezone_offset));
+      setHourly(mapHourly(weather.hourly));
       setSelectedCity(locations[0].name);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');

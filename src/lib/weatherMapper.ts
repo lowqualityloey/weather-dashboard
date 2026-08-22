@@ -48,23 +48,11 @@ export function mapDaily(daily: DailyWeather[]): MappedDaily[] {
   }));
 }
 
-export function mapHourly(
-  hourly: HourlyWeather[],
-  date: Date,
-  timezoneOffset: number,
-): MappedHourly[] {
-  const targetDate = new Date((date.getTime() / 1000 + timezoneOffset) * 1000);
-  const targetDay = targetDate.getUTCDate();
-
-  return hourly
-    .filter((h) => {
-      const d = new Date((h.dt + timezoneOffset) * 1000);
-      return d.getUTCDate() === targetDay;
-    })
-    .map((h) => ({
-      dt: h.dt,
-      temp: Math.round(h.temp),
-      description: h.weather[0].description,
-      icon: h.weather[0].icon,
-    }));
+export function mapHourly(hourly: HourlyWeather[]): MappedHourly[] {
+  return hourly.slice(0, 5).map((h) => ({
+    dt: h.dt,
+    temp: Math.round(h.temp),
+    description: h.weather[0]?.description ?? '',
+    icon: h.weather[0]?.icon ?? '01d',
+  }));
 }
