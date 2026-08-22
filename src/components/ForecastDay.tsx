@@ -39,11 +39,14 @@ export default function ForecastDay({ day, hourly = [] }: ForecastDayProps) {
 
         {hourly.length > 0 && (
           <CollapsibleContent className="border-t p-4">
-            <div className="flex items-center justify-between gap-3 overflow-x-auto pb-2 min-w-0">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1 min-w-0 no-scrollbar scroll-smooth">
               {hourly.map((h, idx) => (
                 <div key={idx} className="flex flex-col items-center shrink-0 min-w-14 space-y-1">
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(h.dt * 1000).toLocaleTimeString([], { hour: 'numeric' })}
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(h.dt * 1000).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      hour12: true,
+                    })}
                   </span>
                   <img src={getIconUrl(h.icon)} alt="Weather icon" className="w-8 h-8" />
                   <span className="text-sm font-medium">{h.temp}°</span>

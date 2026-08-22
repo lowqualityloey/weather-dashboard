@@ -49,7 +49,7 @@ export function mapDaily(daily: DailyWeather[]): MappedDaily[] {
 }
 
 export function mapHourly(hourly: HourlyWeather[]): MappedHourly[] {
-  return hourly.slice(0, 5).map((h) => ({
+  return hourly.slice(0, 24).map((h) => ({
     dt: h.dt,
     temp: Math.round(h.temp),
     description: h.weather[0]?.description ?? '',

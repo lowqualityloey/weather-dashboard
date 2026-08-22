@@ -6,7 +6,6 @@ import type { GeoLocation } from '../types/weather';
 import { Search, Loader2, MapPin } from 'lucide-react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Button } from './ui/button';
 
 export function SearchBar() {
   const [query, setQuery] = useState('');
@@ -89,7 +88,7 @@ export function SearchBar() {
             id="location-search"
             type="text"
             placeholder="Search for a location..."
-            className="h-12 rounded-full bg-card pl-12 pr-12 text-base shadow-sm"
+            className="h-12 rounded-full bg-card pl-12 pr-14 text-base shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -98,18 +97,19 @@ export function SearchBar() {
             disabled={isLoading}
             autoComplete="off"
           />
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            onClick={fetchCurrentLocation}
+            onClick={() => {
+              setQuery('');
+              fetchCurrentLocation();
+            }}
             disabled={isLoading}
             aria-label="Use current location"
             title="Use current location"
-            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-muted hover:text-primary active:scale-95 disabled:pointer-events-none disabled:opacity-50 cursor-pointer"
           >
-            <MapPin size={18} />
-          </Button>
+            <MapPin className="h-4 w-4" />
+          </button>
         </div>
       </form>
 

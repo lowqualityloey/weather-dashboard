@@ -28,7 +28,7 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
 
   const [currentRes, hourlyRes, dailyRes] = await Promise.all([
     fetch(`${ONECALL_4_BASE}/current?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
-    fetch(`${ONECALL_4_BASE}/timeline/15min?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
+    fetch(`${ONECALL_4_BASE}/timeline/1h?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
     fetch(`${ONECALL_4_BASE}/timeline/1day?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
   ]);
 
@@ -58,6 +58,22 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     weather: { description: string; icon: string }[];
   }
 
+  let hourlyItems: HourlyItem[] = (hourlyJson.data as HourlyItem[]) ?? [];
+
+  // Fetch page 2 if needed to provide a full 24 hours
+  if (hourlyJson.next && hourlyItems.length < 24) {
+    try {
+      const nextUrl = String(hourlyJson.next).replace(/^http:\/\//i, 'https://');
+      const page2Res = await fetch(nextUrl);
+      if (page2Res.ok) {
+        const page2Json = await page2Res.json();
+        hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
+      }
+    } catch {
+      // Fall back to page 1 items
+    }
+  }
+
   const daily: DailyWeather[] = ((dailyJson.data as DailyItem[]) ?? [])
     .slice(0, 5)
     .map((d) => ({
@@ -69,15 +85,12 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
       weather: d.weather ?? [],
     }));
 
-  // Take 5 hourly forecast snapshots (sampling every 4th 15-min interval = 1 hour apart)
-  const hourly: HourlyWeather[] = ((hourlyJson.data as HourlyItem[]) ?? [])
-    .filter((_, idx) => idx % 4 === 0)
-    .slice(0, 5)
-    .map((h) => ({
-      dt: h.dt,
-      temp: h.temp,
-      weather: h.weather ?? [],
-    }));
+  // Map 24 hourly forecast snapshots
+  const hourly: HourlyWeather[] = hourlyItems.slice(0, 24).map((h) => ({
+    dt: h.dt,
+    temp: h.temp,
+    weather: h.weather ?? [],
+  }));
 
   const data: WeatherData = {
     timezone,
