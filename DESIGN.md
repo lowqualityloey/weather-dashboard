@@ -1,17 +1,17 @@
 ---
 name: Modern Weather Dashboard
 colors:
-  primary: "#2563EB"
-  primary-foreground: "#FFFFFF"
-  secondary: "#E2E8F0"
-  background: "#F0F4F8"
-  foreground: "#1E293B"
-  card: "#FFFFFF"
-  card-foreground: "#1E293B"
-  muted: "#F1F5F9"
-  muted-foreground: "#64748B"
-  border: "#E2E8F0"
-  accent-yellow: "#FACC15"
+  primary: '#2563EB'
+  primary-foreground: '#FFFFFF'
+  secondary: '#E2E8F0'
+  background: '#F0F4F8'
+  foreground: '#1E293B'
+  card: '#FFFFFF'
+  card-foreground: '#1E293B'
+  muted: '#F1F5F9'
+  muted-foreground: '#64748B'
+  border: '#E2E8F0'
+  accent-yellow: '#FACC15'
 typography:
   headline-lg:
     fontFamily: Geist Variable, sans-serif
@@ -45,11 +45,11 @@ spacing:
   xl: 32px
 components:
   card:
-    backgroundColor: "{colors.card}"
-    rounded: "{rounded.lg}"
+    backgroundColor: '{colors.card}'
+    rounded: '{rounded.lg}'
     padding: 24px
   button-icon:
-    rounded: "{rounded.full}"
+    rounded: '{rounded.full}'
     size: 36px
 ---
 

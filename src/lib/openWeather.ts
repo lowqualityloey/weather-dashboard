@@ -74,16 +74,14 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     }
   }
 
-  const daily: DailyWeather[] = ((dailyJson.data as DailyItem[]) ?? [])
-    .slice(0, 5)
-    .map((d) => ({
-      dt: d.dt,
-      temp: {
-        min: d.temp?.min ?? d.temp?.day ?? 0,
-        max: d.temp?.max ?? d.temp?.day ?? 0,
-      },
-      weather: d.weather ?? [],
-    }));
+  const daily: DailyWeather[] = ((dailyJson.data as DailyItem[]) ?? []).slice(0, 5).map((d) => ({
+    dt: d.dt,
+    temp: {
+      min: d.temp?.min ?? d.temp?.day ?? 0,
+      max: d.temp?.max ?? d.temp?.day ?? 0,
+    },
+    weather: d.weather ?? [],
+  }));
 
   // Map 24 hourly forecast snapshots
   const hourly: HourlyWeather[] = hourlyItems.slice(0, 24).map((h) => ({

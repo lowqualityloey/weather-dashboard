@@ -83,9 +83,7 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       (err) => {
         setIsLoading(false);
         if (err.code === err.PERMISSION_DENIED) {
-          setError(
-            'Location permission denied. Please allow location access or search manually.',
-          );
+          setError('Location permission denied. Please allow location access or search manually.');
         } else if (err.code === err.POSITION_UNAVAILABLE) {
           setError('Location information is unavailable.');
         } else if (err.code === err.TIMEOUT) {
