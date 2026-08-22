@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWeather } from '../context/WeatherContext';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { ThemeToggle } from './ThemeToggle';
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,6 +89,12 @@ export function MobileNav() {
                   })}
                 </ul>
               )}
+            </div>
+
+            {/* Mobile Drawer Footer */}
+            <div className="pt-4 border-t border-sidebar-border flex items-center justify-between">
+              <span className="text-xs text-muted-foreground font-medium">Appearance</span>
+              <ThemeToggle />
             </div>
           </div>
         </div>

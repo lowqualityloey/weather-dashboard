@@ -7,7 +7,6 @@ import CurrentWeather from './components/CurrentWeather';
 import ForecastList from './components/ForecastList';
 
 import { ThemeProvider } from './context/ThemeContext';
-import { ThemeToggle } from './components/ThemeToggle';
 import { MobileNav } from './components/MobileNav';
 import { WeatherSkeleton } from './components/WeatherSkeleton';
 import { ErrorAlert } from './components/ErrorAlert';
@@ -20,9 +19,6 @@ function WeatherDashboard() {
       <Sidebar />
       <main id="main-content" className="relative flex-1 p-6 space-y-6">
         <MobileNav />
-        <div className="flex justify-end mb-4 ml-auto">
-          <ThemeToggle />
-        </div>
         <SearchBar />
 
         {error && <ErrorAlert message={error} />}
