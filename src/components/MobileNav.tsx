@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useWeather } from '../context/WeatherContext';
+import { useWeather, type SavedCity } from '../context/WeatherContext';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
@@ -7,10 +7,10 @@ import { SavedCitiesList } from './SavedCitiesList';
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const { searchCity } = useWeather();
+  const { selectSavedCity } = useWeather();
 
-  const handleSelectCity = (city: string) => {
-    void searchCity(city);
+  const handleSelectCity = (city: SavedCity) => {
+    void selectSavedCity(city);
     setIsOpen(false);
   };
 

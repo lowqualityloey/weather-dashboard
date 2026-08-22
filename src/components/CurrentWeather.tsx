@@ -11,15 +11,15 @@ interface CurrentWeatherProps {
 }
 
 export default function CurrentWeather({ data, cityName }: CurrentWeatherProps) {
-  const { savedCities, addSavedCity, removeSavedCity } = useWeather();
+  const { savedCities, addSavedCity, removeSavedCity, selectedLocation } = useWeather();
   const name = cityName ?? 'Current Location';
-  const isSaved = savedCities.some((c) => c.toLowerCase() === name.toLowerCase());
+  const isSaved = savedCities.some((c) => c.name.toLowerCase() === name.toLowerCase());
 
   const handleToggleSave = () => {
     if (isSaved) {
       removeSavedCity(name);
-    } else {
-      addSavedCity(name);
+    } else if (selectedLocation) {
+      addSavedCity(name, selectedLocation.lat, selectedLocation.lon);
     }
   };
 
