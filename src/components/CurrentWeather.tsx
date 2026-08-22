@@ -52,24 +52,36 @@ export default function CurrentWeather({ data, cityName }: CurrentWeatherProps) 
         </button>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src={getIconUrl(data.icon)} alt={data.description} className="h-24 w-24" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-1">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <img
+              src={getIconUrl(data.icon)}
+              alt={data.description}
+              className="h-20 w-20 sm:h-24 sm:w-24 drop-shadow-md object-contain"
+            />
             <div>
-              <div className="text-5xl font-bold">{data.temp}°</div>
-              <div className="text-lg">{data.description}</div>
+              <div className="text-4xl sm:text-5xl font-bold tracking-tight">{data.temp}°</div>
+              <div className="text-base sm:text-lg text-blue-100 capitalize font-medium">
+                {data.description}
+              </div>
             </div>
           </div>
-          <div className="text-right">
-            <div>Feels like: {data.feelsLike}°</div>
-            <div>Humidity: {data.humidity}%</div>
-            <div className="flex items-center justify-end gap-2">
+          <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-x-6 gap-y-1.5 text-sm sm:text-right text-blue-100 font-medium w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/15">
+            <div>
+              Feels like: <span className="font-semibold text-white">{data.feelsLike}°</span>
+            </div>
+            <div>
+              Humidity: <span className="font-semibold text-white">{data.humidity}%</span>
+            </div>
+            <div className="flex items-center gap-1.5">
               <Navigation
-                className="h-4 w-4 fill-current transition-transform duration-300"
+                className="h-4 w-4 fill-current transition-transform duration-300 text-white shrink-0"
                 style={{ transform: `rotate(${data.windDeg}deg)` }}
+                aria-hidden="true"
               />
               <span>
-                {getWindDirection(data.windDeg)} ({data.windSpeed} km/h)
+                {getWindDirection(data.windDeg)} (
+                <span className="font-semibold text-white">{data.windSpeed} km/h</span>)
               </span>
             </div>
           </div>

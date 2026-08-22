@@ -19,19 +19,21 @@ function WeatherDashboard() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <LiveAnnouncer />
-      <main id="main-content" className="relative flex-1 p-6 space-y-6">
-        <MobileNav />
-        <SearchBar />
+      <main id="main-content" className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto min-w-0">
+        <div className="mx-auto max-w-6xl w-full space-y-6">
+          <MobileNav />
+          <SearchBar />
 
-        {error && <ErrorAlert message={error} />}
-        {isLoading && <WeatherSkeleton />}
+          {error && <ErrorAlert message={error} />}
+          {isLoading && <WeatherSkeleton />}
 
-        {current && !isLoading && (
-          <>
-            <CurrentWeather data={current} cityName={selectedCity} />
-            <ForecastList daily={daily} hourly={hourly} />
-          </>
-        )}
+          {current && !isLoading && (
+            <>
+              <CurrentWeather data={current} cityName={selectedCity} />
+              <ForecastList daily={daily} hourly={hourly} />
+            </>
+          )}
+        </div>
       </main>
     </div>
   );
