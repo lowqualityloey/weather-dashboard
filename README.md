@@ -21,8 +21,9 @@ A high-performance, responsive Progressive Web App (PWA) built with React 19, Ty
 ### 💾 Performance & State Management
 
 - **TTL Client-Side Caching:** 10-minute cache layer (`cache.ts`) using `localStorage` to eliminate redundant API calls and stay well within API quotas.
-- **Favorite Cities Persistence:** Save favorite locations with duplicate prevention and synchronized `localStorage` state across sessions.
-- **Theme Customization:** System, light, and dark mode theming with smooth transition toggles.
+- **Favorite Cities Persistence:** Save favorite locations with their coordinates and duplicate prevention, synced across sessions via `localStorage` — selecting a saved city always resolves to the exact place it was saved.
+- **Race-Safe Requests:** Weather requests are guarded so only the latest search or GPS location applies its result, preventing slow responses from overwriting newer selections.
+- **Theme Customization:** System, light, and dark mode theming with smooth toggles and a live-updating system color-scheme preference.
 - **Loading & Error Feedback:** Skeleton placeholders (`WeatherSkeleton.tsx`) and dismissible error alerts (`ErrorAlert.tsx`).
 - **Screen Reader Support:** Accessible `LiveAnnouncer` with `aria-live="polite"` region broadcasting status updates and weather reports.
 
@@ -68,6 +69,7 @@ src/
 │   ├── LiveAnnouncer.tsx    # Screen reader aria-live announcement region
 │   ├── MobileNav.tsx        # Slide-over navigation drawer for saved cities
 │   ├── SearchBar.tsx        # Debounced combobox with GPS location detection
+│   ├── SavedCitiesList.tsx  # Shared saved-cities list with coordinate-based selection
 │   ├── Sidebar.tsx          # Saved cities sidebar with theme toggle
 │   ├── ThemeToggle.tsx      # Light/dark mode button
 │   └── WeatherSkeleton.tsx  # Pulsing skeleton loading state
@@ -117,6 +119,8 @@ npm run test:watch
 - `weatherMapper.test.ts`: Wind speed conversions (`m/s` to `km/h`), rounding, 5-day daily slicing, and 24-hour hourly limits.
 - `useDebounce.test.ts`: Timed value propagation using `vi.useFakeTimers()`.
 - `useLocalStorage.test.ts`: State initialization, updates, and persistence.
+- `WeatherContext.test.tsx`: Latest-request-wins orchestration under out-of-order responses, stale error handling, saved-city coordinate storage, and legacy entry migration.
+- `SearchBar.test.tsx`: Debounced geocoding suggestions and the minimum-query-length guard.
 
 ---
 
