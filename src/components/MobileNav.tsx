@@ -3,10 +3,11 @@ import { useWeather } from '../context/WeatherContext';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
+import { SavedCitiesList } from './SavedCitiesList';
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const { savedCities, removeSavedCity, searchCity, selectedCity } = useWeather();
+  const { searchCity } = useWeather();
 
   const handleSelectCity = (city: string) => {
     void searchCity(city);
@@ -51,44 +52,7 @@ export function MobileNav() {
             </div>
 
             <div className="flex-1 overflow-y-auto py-4">
-              {savedCities.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No saved cities.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {savedCities.map((city) => {
-                    const isSelected = city.toLowerCase() === selectedCity.toLowerCase();
-                    return (
-                      <li
-                        key={city}
-                        className="group flex items-center justify-between rounded-lg transition-colors"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleSelectCity(city)}
-                          className={`flex flex-1 items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors text-left ${
-                            isSelected
-                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
-                              : 'hover:bg-muted text-sidebar-foreground'
-                          }`}
-                        >
-                          <span className="truncate">{city}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeSavedCity(city);
-                          }}
-                          aria-label={`Remove ${city}`}
-                          className="ml-1 rounded-md p-1.5 text-muted-foreground opacity-70 transition-opacity hover:bg-muted hover:text-foreground hover:opacity-100"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+              <SavedCitiesList onSelect={handleSelectCity} />
             </div>
 
             {/* Mobile Drawer Footer */}
