@@ -36,19 +36,19 @@ A high-performance, responsive Progressive Web App (PWA) built with React 19, Ty
 
 ## 🛠️ Tech Stack
 
-| Technology                         | Purpose                                               |
-| :--------------------------------- | :---------------------------------------------------- |
-| **React 19**                       | Component architecture and state management           |
-| **TypeScript**                     | Strict compile-time type safety                       |
-| **Vite 8**                         | High-speed frontend build tool and dev server         |
-| **Tailwind CSS 4**                 | Modern utility-first CSS design tokens                |
-| **shadcn/ui + Base UI**            | Accessible headless UI component primitives           |
-| **Vitest & React Testing Library** | Unit testing suite with 100% test pass rate           |
-| **vite-plugin-pwa**                | Progressive Web App & Service Worker precaching       |
-| **GitHub Actions**                 | Automated CI/CD test and build validation pipeline    |
-| **Geist Variable Font**            | Self-hosted typography (`@fontsource-variable/geist`) |
-| **Lucide React**                   | Feather-light SVG icons                               |
-| **OpenWeather One Call & Geo API** | Real-time weather and geocoding endpoints             |
+| Technology                            | Purpose                                                   |
+| :------------------------------------ | :-------------------------------------------------------- |
+| **React 19**                          | Component architecture and state management               |
+| **TypeScript**                        | Strict compile-time type safety                           |
+| **Vite 8**                            | High-speed frontend build tool and dev server             |
+| **Tailwind CSS 4**                    | Modern utility-first CSS design tokens                    |
+| **Base UI + shadcn-style components** | Accessible headless UI primitives built with CVA variants |
+| **Vitest & React Testing Library**    | Unit testing suite with 100% test pass rate               |
+| **vite-plugin-pwa**                   | Progressive Web App & Service Worker precaching           |
+| **GitHub Actions**                    | Automated CI/CD test and build validation pipeline        |
+| **Geist Variable Font**               | Self-hosted typography (`@fontsource-variable/geist`)     |
+| **Lucide React**                      | Feather-light SVG icons                                   |
+| **OpenWeather One Call & Geo API**    | Real-time weather and geocoding endpoints                 |
 
 ---
 
