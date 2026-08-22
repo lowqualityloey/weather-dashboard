@@ -15,7 +15,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useLocalStorage<Theme>('weather_theme', 'system');
 
   const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(
-    () => typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+    () =>
+      typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
   );
 
   // Keep in sync with live OS theme changes while on "system".

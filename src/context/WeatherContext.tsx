@@ -97,7 +97,11 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
   };
 
   const runWeatherRequest = async (
-    work: () => Promise<{ name: string; location: { lat: number; lon: number }; weather: WeatherData }>,
+    work: () => Promise<{
+      name: string;
+      location: { lat: number; lon: number };
+      weather: WeatherData;
+    }>,
   ) => {
     const id = ++requestRef.current;
     setIsLoading(true);

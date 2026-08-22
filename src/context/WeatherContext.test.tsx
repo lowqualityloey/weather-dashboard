@@ -91,7 +91,10 @@ describe('WeatherContext request orchestration', () => {
       { name: city, country: 'X', lat: ++seq, lon: 0 },
     ]);
 
-    const pending = new Map<number, { resolve: (d: WeatherData) => void; reject: (e: Error) => void }>();
+    const pending = new Map<
+      number,
+      { resolve: (d: WeatherData) => void; reject: (e: Error) => void }
+    >();
     fetchMock.mockImplementation(
       (lat) =>
         new Promise<WeatherData>((resolve, reject) => {
