@@ -1,77 +1,62 @@
-# 🌤️ Modern Weather Dashboard
+# 🌤️ Modern Weather Dashboard (SkyPulse)
 
-A responsive weather dashboard built with React and TypeScript as a refresher project. It lets users search for locations, view current conditions and a five-day forecast, expand a day for hourly weather, save favourite cities, and switch between light and dark themes.
+A high-performance, responsive Progressive Web App (PWA) built with React 19, TypeScript, Tailwind CSS v4, and OpenWeather APIs. It delivers real-time weather metrics, debounced location search with autocomplete, interactive 24-hour carousels, 5-day forecasts, GPS location detection, client-side caching with TTL, saved city persistence, dark mode, screen-reader accessibility, and an automated GitHub Actions CI pipeline.
 
-> This project focuses on refreshing React, TypeScript, API integration, responsive UI development, state management, local storage, Git workflow, and deployment.
+---
 
-## Live Demo
+## 🚀 Key Features
 
-🚧 Coming soon
+### 🔍 Search & Geolocation
 
-## Preview
+- **Debounced Location Search:** 400ms debounced queries via custom `useDebounce` hook with real-time geocoding autocomplete suggestions.
+- **One-Click GPS Detection:** Auto-detect current coordinates using `navigator.geolocation` with reverse geocoding fallback.
+- **Keyboard Navigation:** Full WAI-ARIA combobox support with `ArrowUp`, `ArrowDown`, `Enter`, and `Escape` keyboard shortcuts.
 
-🚧 Screenshots coming soon
+### 📊 Weather Insights
 
-## Features
+- **Current Conditions Card:** Temperature, "feels like", condition icon, humidity, and rotating wind compass with metric conversion (`km/h`).
+- **24-Hour Hourly Forecast:** Smooth horizontal scrolling carousel showing temperature curves and weather conditions throughout the day.
+- **5-Day Extended Forecast:** Structured daily forecast cards displaying condition descriptions and min/max temperature ranges.
 
-### Core Features
+### 💾 Performance & State Management
 
-- [x] Search for a city using the OpenWeather Geocoding API
-- [x] View current weather conditions
-  - Temperature
-  - "Feels like" temperature
-  - Weather condition and icon
-  - Humidity
-  - Wind speed and direction
-- [x] View a five-day forecast
-- [x] Expand a forecast day to view weather at three-hour intervals
-- [x] Save and remove favourite cities
-- [x] Persist saved cities with `localStorage`
-- [x] Toggle between light and dark themes
-- [x] Responsive desktop and mobile layouts
-- [x] Use metric units: Celsius and kilometres per hour
+- **TTL Client-Side Caching:** 10-minute cache layer (`cache.ts`) using `localStorage` to eliminate redundant API calls and stay well within API quotas.
+- **Favorite Cities Persistence:** Save favorite locations with duplicate prevention and synchronized `localStorage` state across sessions.
+- **Theme Customization:** System, light, and dark mode theming with smooth transition toggles.
+- **Loading & Error Feedback:** Skeleton placeholders (`WeatherSkeleton.tsx`) and dismissible error alerts (`ErrorAlert.tsx`).
+- **Screen Reader Support:** Accessible `LiveAnnouncer` with `aria-live="polite"` region broadcasting status updates and weather reports.
 
-### Stretch Features
+### 📱 Progressive Web App (PWA) & CI/CD
 
-- [ ] Browser geolocation for the user's current location
-- [ ] Celsius/Fahrenheit unit toggle
-- [ ] Search-result suggestions for locations with the same name
-- [ ] Skeleton loading states
-- [ ] "Last updated" weather timestamp
-- [ ] Request caching and debounced search
-- [ ] Progressive Web App support
+- **Installable PWA:** Configured via `vite-plugin-pwa` with Web App Manifest, maskable SVG icons, and Workbox offline asset precaching.
+- **Continuous Integration (CI):** Automated GitHub Actions workflow (`.github/workflows/ci.yml`) validating Prettier formatting, ESLint rules, TypeScript checks, Vitest unit tests, and production bundling on every push and PR.
 
-## Design Reference
+---
 
-The dashboard is inspired by a modern, calm weather interface with:
+## 🛠️ Tech Stack
 
-- Pale blue gradient background
-- White, rounded weather cards with soft shadows
-- A sidebar for saved cities
-- A central current-weather card
-- Expandable forecast rows
+| Technology                         | Purpose                                               |
+| :--------------------------------- | :---------------------------------------------------- |
+| **React 19**                       | Component architecture and state management           |
+| **TypeScript**                     | Strict compile-time type safety                       |
+| **Vite 8**                         | High-speed frontend build tool and dev server         |
+| **Tailwind CSS 4**                 | Modern utility-first CSS design tokens                |
+| **shadcn/ui + Base UI**            | Accessible headless UI component primitives           |
+| **Vitest & React Testing Library** | Unit testing suite with 100% test pass rate           |
+| **vite-plugin-pwa**                | Progressive Web App & Service Worker precaching       |
+| **GitHub Actions**                 | Automated CI/CD test and build validation pipeline    |
+| **Geist Variable Font**            | Self-hosted typography (`@fontsource-variable/geist`) |
+| **Lucide React**                   | Feather-light SVG icons                               |
+| **OpenWeather One Call & Geo API** | Real-time weather and geocoding endpoints             |
 
-## Tech Stack
+---
 
-| Technology                   | Purpose                                                       |
-| ---------------------------- | ------------------------------------------------------------- |
-| React 19                     | Component-based user interface                                |
-| TypeScript 6                 | Type-safe JavaScript                                          |
-| Vite 8                       | Development server and production build tooling               |
-| Tailwind CSS 4               | Utility-first styling                                         |
-| shadcn/ui + Base UI          | Accessible and reusable UI component primitives (Nova preset) |
-| Lucide React                 | Icons                                                         |
-| Geist (variable font)        | Typography                                                    |
-| ESLint + Prettier            | Linting and formatting                                        |
-| OpenWeather Geocoding API    | Convert location names into coordinates                       |
-| OpenWeather One Call API 3.0 | Current, hourly, and daily weather data                       |
-
-## Project Structure
+## 📁 Project Structure
 
 ```text
 src/
 ├── components/
-│   ├── ui/                  # shadcn/ui components (Base UI + Nova)
+│   ├── ui/                  # Base UI / shadcn accessible primitives
 │   │   ├── badge.tsx
 │   │   ├── button.tsx
 │   │   ├── card.tsx
@@ -79,225 +64,127 @@ src/
 │   │   ├── input.tsx
 │   │   ├── label.tsx
 │   │   └── switch.tsx
-│   ├── SearchBar.tsx        # Location search input (presentational)
-│   ├── Sidebar.tsx          # City list sidebar (mock data)
-│   ├── CurrentWeather.tsx   # Current conditions card (stub)
-│   ├── ForecastList.tsx     # Five-day forecast container (stub)
-│   └── ForecastDay.tsx      # Forecast row + hourly panel (stub)
+│   ├── CurrentWeather.tsx   # Hero weather card with favorite toggle & wind direction
+│   ├── ErrorAlert.tsx       # Dismissible alert banner
+│   ├── ForecastDay.tsx      # Individual daily forecast card
+│   ├── ForecastList.tsx     # 24-hour carousel + 5-day forecast grid
+│   ├── LiveAnnouncer.tsx    # Screen reader aria-live announcement region
+│   ├── MobileNav.tsx        # Slide-over navigation drawer for saved cities
+│   ├── SearchBar.tsx        # Debounced combobox with GPS location detection
+│   ├── Sidebar.tsx          # Saved cities sidebar with theme toggle
+│   ├── ThemeToggle.tsx      # Light/dark mode button
+│   └── WeatherSkeleton.tsx  # Pulsing skeleton loading state
+├── context/
+│   ├── ThemeContext.tsx     # Theme state provider (light/dark/system)
+│   └── WeatherContext.tsx   # Global weather and saved cities provider
+├── hooks/
+│   ├── useDebounce.test.ts  # Fake timer unit tests for debounced queries
+│   ├── useDebounce.ts       # Generic debouncing hook
+│   ├── useLocalStorage.test.ts # Storage persistence unit tests
+│   └── useLocalStorage.ts  # Synchronized localStorage state hook
 ├── lib/
-│   ├── openWeather.ts       # OpenWeather API requests
-│   ├── weatherMapper.ts     # API response → UI data mapping
-│   ├── weatherIcons.ts      # Weather condition icon helpers
-│   └── utils.ts             # cn() utility (clsx + tailwind-merge)
+│   ├── cache.test.ts        # TTL cache expiration unit tests
+│   ├── cache.ts             # Generic localStorage cache with TTL
+│   ├── env.ts               # Runtime environment variable validation
+│   ├── openWeather.ts       # OpenWeather API client + reverse geocoding
+│   ├── utils.ts             # cn() utility helper
+│   ├── weatherIcons.ts      # OpenWeather icon URL mapping
+│   ├── weatherMapper.test.ts # Metric conversions and data slicing unit tests
+│   └── weatherMapper.ts     # OpenWeather response transformer
+├── test/
+│   └── setup.ts             # Vitest DOM matcher setup (@testing-library/jest-dom)
 ├── types/
-│   └── weather.ts           # TypeScript weather interfaces
+│   └── weather.ts           # TypeScript interfaces for API models
 ├── App.tsx
 ├── main.tsx
-└── index.css                # Tailwind v4 imports, theme tokens, base styles
+└── index.css
 ```
 
-## API Flow
+---
 
-OpenWeather One Call API requests require latitude and longitude, so the app uses two API calls:
+## 🧪 Testing Suite
 
-1. The user searches for a city, for example `Taupō`.
-2. The Geocoding API returns matching locations with coordinates.
-3. The app selects a location and sends its latitude and longitude to One Call API 3.0.
-4. The app maps the response into UI-friendly data and displays it.
+The repository includes a comprehensive unit testing suite using **Vitest** and **React Testing Library**:
 
-```text
-City search
-    ↓
-OpenWeather Geocoding API
-    ↓
-Latitude + Longitude
-    ↓
-OpenWeather One Call API 3.0
-    ↓
-Current weather + hourly forecast + daily forecast
+```bash
+# Run unit tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
-## Weather Data Mapping
+**Tested Areas:**
 
-| Dashboard item            | One Call API field                       |
-| ------------------------- | ---------------------------------------- |
-| Current temperature       | `current.temp`                           |
-| Feels-like temperature    | `current.feels_like`                     |
-| Humidity                  | `current.humidity`                       |
-| Wind speed                | `current.wind_speed`                     |
-| Wind direction            | `current.wind_deg`                       |
-| Current weather condition | `current.weather[0].description`         |
-| Current weather icon      | `current.weather[0].icon`                |
-| Five-day forecast         | `daily.slice(0, 5)`                      |
-| Expanded hourly forecast  | `hourly`, filtered for the selected date |
-| Time zone                 | `timezone` and `timezone_offset`         |
+- `cache.test.ts`: Cache retrieval, TTL expiration handling, and stale key eviction.
+- `weatherMapper.test.ts`: Wind speed conversions (`m/s` to `km/h`), rounding, 5-day daily slicing, and 24-hour hourly limits.
+- `useDebounce.test.ts`: Timed value propagation using `vi.useFakeTimers()`.
+- `useLocalStorage.test.ts`: State initialization, updates, and persistence.
 
-## Getting Started
+---
+
+## ⚡ Getting Started
 
 ### Prerequisites
 
-Make sure you have installed:
-
-- [Node.js](https://nodejs.org/) version 20 or later
-- Yarn (package manager)
-- An OpenWeather API key
+- **Node.js**: v20 or later
+- **npm**: v10 or later
+- An [OpenWeather API Key](https://openweathermap.org/api)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/lowqualityloey/weather-dashboard.git
-   ```
-
-2. Move into the project directory:
-
-   ```bash
    cd weather-dashboard
    ```
 
-3. Install dependencies:
+2. **Install dependencies:**
 
    ```bash
-   yarn install
+   npm install
    ```
 
-4. Create a local environment file:
-
-   ```bash
-   touch .env
-   ```
-
-5. Add your OpenWeather API key to `.env`:
+3. **Configure Environment Variables:**
+   Create a `.env` file in the project root:
 
    ```env
    VITE_OPENWEATHER_API_KEY=your_openweather_api_key_here
    ```
 
-6. Start the development server:
-
+4. **Start the Local Development Server:**
    ```bash
-   yarn dev
+   npm run dev
    ```
+   Open `http://localhost:5173` in your browser.
 
-7. Open the local URL shown in your terminal, usually:
+---
 
-   ```text
-   http://localhost:5173
-   ```
+## 📜 Available Scripts
 
-## Available Scripts
+| Script               | Command                | Purpose                                                   |
+| :------------------- | :--------------------- | :-------------------------------------------------------- |
+| **Dev Server**       | `npm run dev`          | Starts Vite local development server with HMR             |
+| **Run Tests**        | `npm test`             | Executes Vitest unit tests                                |
+| **Type Check**       | `npx tsc --noEmit`     | Runs strict TypeScript validation                         |
+| **Lint Code**        | `npm run lint`         | Runs ESLint                                               |
+| **Format Check**     | `npm run format:check` | Verifies Prettier code formatting                         |
+| **Format Code**      | `npm run format`       | Automatically formats all files with Prettier             |
+| **Build Production** | `npm run build`        | Compiles optimized production bundle & PWA service worker |
+| **Preview Build**    | `npm run preview`      | Serves local production build from `dist/`                |
 
-| Command             | Description                                                      |
-| ------------------- | ---------------------------------------------------------------- |
-| `yarn dev`          | Start the Vite development server                                |
-| `yarn build`        | Type-check with `tsc -b` then create production build in `dist/` |
-| `yarn lint`         | Run ESLint                                                       |
-| `yarn format`       | Format all files with Prettier                                   |
-| `yarn format:check` | Check if files are formatted (CI-friendly)                       |
-| `yarn preview`      | Preview the production build locally                             |
+---
 
-## shadcn/ui Setup
-
-This project uses shadcn/ui with the **Base UI + Nova** preset.
-
-The following components are already installed:
-
-```
-button, card, input, label, switch, collapsible, badge
-```
-
-To add a new component:
-
-```bash
-npx shadcn@latest add <component-name>
-```
-
-Component configuration is in `components.json` (points to `tsconfig.app.json` for path alias resolution).
-
-## Environment Variables
-
-| Variable                   | Description                              |
-| -------------------------- | ---------------------------------------- |
-| `VITE_OPENWEATHER_API_KEY` | OpenWeather API key used by the frontend |
-
-> **Security note:** Variables prefixed with `VITE_` are included in the client-side application bundle. Do not use a sensitive unrestricted production key in a public frontend application.
-
-## Development Roadmap
-
-- [x] Write and confirm project scope
-- [x] Project scaffold — Vite + React + TypeScript + Tailwind CSS
-- [x] Configure shadcn/ui (Base UI + Nova preset)
-- [x] Set up ESLint (flat config) + Prettier
-- [x] Build OpenWeather API service and TypeScript types
-- [x] Add data mappers and weather icon helpers
-- [x] Install UI component primitives (Button, Card, Input, Label, Badge, Switch, Collapsible)
-- [x] Build the static dashboard using mock data
-- [x] Add forecast accordion and theme toggle interactions
-- [x] Connect city search and live weather data
-- [x] Add saved cities with `localStorage`
-- [ ] Add responsive and accessibility improvements
-- [ ] Finalise documentation and screenshots
-- [ ] Deploy to Cloudflare Pages
-
-The complete task backlog is managed in Notion.
-
-## Deployment
-
-Deployment is planned through **Cloudflare Pages**.
-
-### Planned Cloudflare Pages Settings
-
-| Setting                | Value                      |
-| ---------------------- | -------------------------- |
-| Framework              | Vite                       |
-| Build command          | `yarn build`               |
-| Build output directory | `dist`                     |
-| Environment variable   | `VITE_OPENWEATHER_API_KEY` |
-
-Before deploying:
-
-```bash
-yarn lint
-yarn build
-```
-
-## Learning Goals
-
-This project is intended to refresh and demonstrate:
-
-- Building reusable React components
-- Using TypeScript interfaces for API data
-- Managing state with React hooks
-- Fetching and handling asynchronous API data
-- Handling loading, error, and empty UI states
-- Designing responsive layouts with Tailwind CSS
-- Using shadcn/ui with Base UI primitives effectively
-- Persisting client-side data using `localStorage`
-- Managing environment variables in Vite
-- Writing clean commits and documentation
-- Deploying a frontend application
-
-## Future Improvements
-
-- Add browser-location weather
-- Celsius/Fahrenheit unit toggle
-- Add a 7-day / 10-day forecast view
-- Display precipitation probability and UV index
-- Add weather charts
-- Add offline support
-- Add a backend or serverless proxy to keep API credentials private
-
-## Author
+## 👤 Author
 
 **Jonell Balanay**
 
 - GitHub: [@lowqualityloey](https://github.com/lowqualityloey)
 - Location: Taupō, New Zealand
 
-## Acknowledgements
+---
 
-- [OpenWeather](https://openweathermap.org/) for weather and geocoding data
-- [shadcn/ui](https://ui.shadcn.com/) for reusable UI component primitives
-- [Base UI](https://base-ui.dev/) for accessible headless primitives
-- [Lucide](https://lucide.dev/) for icons
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
