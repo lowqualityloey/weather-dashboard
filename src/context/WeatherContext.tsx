@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { createContext, useState, useContext, useEffect, useRef, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { MappedCurrent, MappedDaily, MappedHourly } from '../lib/weatherMapper';
 import type { WeatherData } from '../types/weather';
@@ -60,7 +60,7 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
     'weather_saved_cities',
     DEFAULT_SAVED_CITIES,
   );
-  const savedCities = normalizeSavedCities(savedCitiesStorage);
+  const savedCities = useMemo(() => normalizeSavedCities(savedCitiesStorage), [savedCitiesStorage]);
 
   // Monotonic id so only the latest in-flight request can apply its result.
   const requestRef = useRef(0);
