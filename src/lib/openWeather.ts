@@ -92,8 +92,8 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
           hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
         }
       }
-    } catch {
-      // Fall back to page 1 items
+    } catch (err) {
+      console.warn('Failed to fetch page 2 hourly forecast, falling back to page 1 items:', err);
     }
   }
 
