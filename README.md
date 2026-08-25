@@ -151,7 +151,7 @@ npm run test:watch
    Create a `.env` file in the project root:
 
    ```env
-   VITE_OPENWEATHER_API_KEY=your_openweather_api_key_here
+   OPENWEATHER_API_KEY=your_openweather_api_key_here
    ```
 
 4. **Start the Local Development Server:**
