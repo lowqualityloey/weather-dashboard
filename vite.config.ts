@@ -1,13 +1,31 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type Plugin } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+import { handleOpenWeatherProxy } from './src/server/openWeatherProxy';
+
+function openWeatherProxyPlugin(): Plugin {
+  return {
+    name: 'openweather-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/weather', (req, res) => {
+        void handleOpenWeatherProxy(req, res);
+      });
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use('/api/weather', (req, res) => {
+        void handleOpenWeatherProxy(req, res);
+      });
+    },
+  };
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    openWeatherProxyPlugin(),
     react(),
     tailwindcss(),
     VitePWA({
