@@ -148,4 +148,30 @@ describe('WeatherContext request orchestration', () => {
     expect(saved[0].name).toBe('Auckland');
     expect(Number.isFinite(saved[0].lat)).toBe(false);
   });
+
+  it('preserves user-safe error messages like "City not found"', async () => {
+    geocodeMock.mockResolvedValue([]);
+
+    const { result } = renderHook(() => useWeather(), { wrapper });
+
+    await act(async () => {
+      await result.current.searchCity('NonExistentCity12345');
+    });
+
+    expect(result.current.error).toBe('City not found');
+  });
+
+  it('sanitizes detailed or internal error messages to a safe generic message', async () => {
+    geocodeMock.mockRejectedValue(
+      new Error('Database error connecting to postgres://user:secret_pass@db.local:5432/weather'),
+    );
+
+    const { result } = renderHook(() => useWeather(), { wrapper });
+
+    await act(async () => {
+      await result.current.searchCity('London');
+    });
+
+    expect(result.current.error).toBe('Failed to fetch weather data. Please try again.');
+  });
 });
