@@ -163,14 +163,21 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       (err) => {
         if (id !== requestRef.current) return; // superseded by a newer request
         setIsLoading(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setError('Location permission denied. Please allow location access or search manually.');
-        } else if (err.code === err.POSITION_UNAVAILABLE) {
-          setError('Location information is unavailable.');
-        } else if (err.code === err.TIMEOUT) {
-          setError('Location request timed out.');
-        } else {
-          setError('Failed to detect location.');
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            setError(
+              'Location permission denied. Please allow location access or search manually.',
+            );
+            break;
+          case err.POSITION_UNAVAILABLE:
+            setError('Location information is unavailable.');
+            break;
+          case err.TIMEOUT:
+            setError('Location request timed out.');
+            break;
+          default:
+            setError('Failed to detect location.');
+            break;
         }
       },
       { timeout: 10000, enableHighAccuracy: true },
