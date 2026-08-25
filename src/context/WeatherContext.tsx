@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from 'react';
+import { createContext, useState, useContext, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { MappedCurrent, MappedDaily, MappedHourly } from '../lib/weatherMapper';
 import type { WeatherData } from '../types/weather';
@@ -68,85 +60,80 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
     'weather_saved_cities',
     DEFAULT_SAVED_CITIES,
   );
-  const savedCities = useMemo(() => normalizeSavedCities(savedCitiesStorage), [savedCitiesStorage]);
+  const savedCities = normalizeSavedCities(savedCitiesStorage);
 
   // Monotonic id so only the latest in-flight request can apply its result.
   const requestRef = useRef(0);
   // Ensures the mount-only Taupō seed runs once even under StrictMode.
   const didInitRef = useRef(false);
 
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = () => setError(null);
 
-  const addSavedCity = useCallback(
-    (name: string, lat: number, lon: number) => {
-      setSavedCitiesStorage((prev) => {
-        const list = normalizeSavedCities(prev ?? []);
-        if (list.some((c) => c.name.toLowerCase() === name.toLowerCase())) return list;
-        return [...list, { name, lat, lon }];
-      });
-    },
-    [setSavedCitiesStorage],
-  );
+  const addSavedCity = (name: string, lat: number, lon: number) => {
+    setSavedCitiesStorage((prev) => {
+      const list = normalizeSavedCities(prev ?? []);
+      if (list.some((c) => c.name.toLowerCase() === name.toLowerCase())) return list;
+      return [...list, { name, lat, lon }];
+    });
+  };
 
-  const removeSavedCity = useCallback(
-    (name: string) => {
-      setSavedCitiesStorage((prev) => {
-        const list = normalizeSavedCities(prev ?? []);
-        return list.filter((c) => c.name.toLowerCase() !== name.toLowerCase());
-      });
-    },
-    [setSavedCitiesStorage],
-  );
+  const removeSavedCity = (name: string) => {
+    setSavedCitiesStorage((prev) => {
+      const list = normalizeSavedCities(prev ?? []);
+      return list.filter((c) => c.name.toLowerCase() !== name.toLowerCase());
+    });
+  };
 
-  const applyWeather = useCallback(
-    (name: string, location: { lat: number; lon: number }, weather: WeatherData) => {
-      setCurrent(mapCurrent(weather));
-      setDaily(mapDaily(weather.daily));
-      setHourly(mapHourly(weather.hourly));
-      setSelectedCity(name);
-      setSelectedLocation(location);
-    },
-    [],
-  );
+  const applyWeather = (
+    name: string,
+    location: { lat: number; lon: number },
+    weather: WeatherData,
+  ) => {
+    setCurrent(mapCurrent(weather));
+    setDaily(mapDaily(weather.daily));
+    setHourly(mapHourly(weather.hourly));
+    setSelectedCity(name);
+    setSelectedLocation(location);
+  };
 
-  const runWeatherRequest = useCallback(
-    async (
-      work: () => Promise<{
-        name: string;
-        location: { lat: number; lon: number };
-        weather: WeatherData;
-      }>,
-    ) => {
-      const id = ++requestRef.current;
-      setIsLoading(true);
-      setError(null);
+  const runWeatherRequest = async (
+    work: () => Promise<{
+      name: string;
+      location: { lat: number; lon: number };
+      weather: WeatherData;
+    }>,
+  ) => {
+    const id = ++requestRef.current;
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const { name, location, weather } = await work();
-        if (id !== requestRef.current) return; // stale response, discard
-        applyWeather(name, location, weather);
-      } catch (err: unknown) {
-        if (id !== requestRef.current) return;
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        if (id === requestRef.current) setIsLoading(false);
+    try {
+      const { name, location, weather } = await work();
+      if (id !== requestRef.current) return; // stale response, discard
+      applyWeather(name, location, weather);
+    } catch (err: unknown) {
+      if (id !== requestRef.current) return;
+      const SAFE_ERRORS = new Set(['City not found']);
+      const rawMessage = err instanceof Error ? err.message : '';
+      if (SAFE_ERRORS.has(rawMessage)) {
+        setError(rawMessage);
+      } else {
+        setError('Failed to fetch weather data. Please try again.');
       }
-    },
-    [applyWeather],
-  );
+    } finally {
+      if (id === requestRef.current) setIsLoading(false);
+    }
+  };
 
-  const fetchWeatherByCoords = useCallback(
-    async (lat: number, lon: number, cityName?: string) => {
-      await runWeatherRequest(async () => ({
-        name: cityName ?? (await reverseGeocode(lat, lon)),
-        location: { lat, lon },
-        weather: await fetchWeather(lat, lon),
-      }));
-    },
-    [runWeatherRequest],
-  );
+  const fetchWeatherByCoords = async (lat: number, lon: number, cityName?: string) => {
+    await runWeatherRequest(async () => ({
+      name: cityName ?? (await reverseGeocode(lat, lon)),
+      location: { lat, lon },
+      weather: await fetchWeather(lat, lon),
+    }));
+  };
 
-  const fetchCurrentLocation = useCallback(() => {
+  const fetchCurrentLocation = () => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser.');
       return;
@@ -163,100 +150,73 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       (err) => {
         if (id !== requestRef.current) return; // superseded by a newer request
         setIsLoading(false);
-        switch (err.code) {
-          case err.PERMISSION_DENIED:
-            setError(
-              'Location permission denied. Please allow location access or search manually.',
-            );
-            break;
-          case err.POSITION_UNAVAILABLE:
-            setError('Location information is unavailable.');
-            break;
-          case err.TIMEOUT:
-            setError('Location request timed out.');
-            break;
-          default:
-            setError('Failed to detect location.');
-            break;
+        if (err.code === err.PERMISSION_DENIED) {
+          setError('Location permission denied. Please allow location access or search manually.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setError('Location information is unavailable.');
+        } else if (err.code === err.TIMEOUT) {
+          setError('Location request timed out.');
+        } else {
+          setError('Failed to detect location.');
         }
       },
       { timeout: 10000, enableHighAccuracy: true },
     );
-  }, [fetchWeatherByCoords]);
+  };
 
-  const searchCity = useCallback(
-    async (city: string) => {
-      await runWeatherRequest(async () => {
-        const locations = await geocodeCity(city);
-        if (!locations.length) {
-          throw new Error('City not found');
-        }
-        return {
-          name: locations[0].name,
-          location: { lat: locations[0].lat, lon: locations[0].lon },
-          weather: await fetchWeather(locations[0].lat, locations[0].lon),
-        };
-      });
-    },
-    [runWeatherRequest],
-  );
+  const searchCity = async (city: string) => {
+    await runWeatherRequest(async () => {
+      const locations = await geocodeCity(city);
+      if (!locations.length) {
+        throw new Error('City not found');
+      }
+      return {
+        name: locations[0].name,
+        location: { lat: locations[0].lat, lon: locations[0].lon },
+        weather: await fetchWeather(locations[0].lat, locations[0].lon),
+      };
+    });
+  };
 
   // Prefer exact coordinates; fall back to a name search for legacy entries.
-  const selectSavedCity = useCallback(
-    async (city: SavedCity) => {
-      if (Number.isFinite(city.lat) && Number.isFinite(city.lon)) {
-        await fetchWeatherByCoords(city.lat, city.lon, city.name);
-      } else {
-        await searchCity(city.name);
-      }
-    },
-    [fetchWeatherByCoords, searchCity],
-  );
+  const selectSavedCity = async (city: SavedCity) => {
+    if (Number.isFinite(city.lat) && Number.isFinite(city.lon)) {
+      await fetchWeatherByCoords(city.lat, city.lon, city.name);
+    } else {
+      await searchCity(city.name);
+    }
+  };
 
   useEffect(() => {
     if (didInitRef.current) return;
     didInitRef.current = true;
     void searchCity('Taupō');
-  }, [searchCity]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const value = useMemo(
-    () => ({
-      current,
-      hourly,
-      daily,
-      selectedCity,
-      selectedLocation,
-      isLoading,
-      error,
-      savedCities,
-      searchCity,
-      clearError,
-      addSavedCity,
-      removeSavedCity,
-      selectSavedCity,
-      fetchCurrentLocation,
-      fetchWeatherByCoords,
-    }),
-    [
-      current,
-      hourly,
-      daily,
-      selectedCity,
-      selectedLocation,
-      isLoading,
-      error,
-      savedCities,
-      searchCity,
-      clearError,
-      addSavedCity,
-      removeSavedCity,
-      selectSavedCity,
-      fetchCurrentLocation,
-      fetchWeatherByCoords,
-    ],
+  return (
+    <WeatherContext.Provider
+      value={{
+        current,
+        hourly,
+        daily,
+        selectedCity,
+        selectedLocation,
+        isLoading,
+        error,
+        savedCities,
+        searchCity,
+        clearError,
+        addSavedCity,
+        removeSavedCity,
+        selectSavedCity,
+        fetchCurrentLocation,
+        fetchWeatherByCoords,
+      }}
+    >
+      {children}
+    </WeatherContext.Provider>
   );
-
-  return <WeatherContext.Provider value={value}>{children}</WeatherContext.Provider>;
 }
 
 export function useWeather() {

@@ -1,5 +1,5 @@
 // src/lib/env.ts
-export function getEnvVar(key: string): string {
+function getEnvVar(key: string): string {
   const value = import.meta.env[key] as string | undefined;
 
   if (!value || value.trim() === '') {

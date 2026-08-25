@@ -23,7 +23,6 @@ export interface MappedHourly {
   temp: number;
   description: string;
   icon: string;
-  formattedTime: string;
 }
 
 export function mapCurrent(data: WeatherData): MappedCurrent {
@@ -50,17 +49,10 @@ export function mapDaily(daily: DailyWeather[]): MappedDaily[] {
 }
 
 export function mapHourly(hourly: HourlyWeather[]): MappedHourly[] {
-  return hourly.slice(0, 24).map((h, idx) => ({
+  return hourly.slice(0, 24).map((h) => ({
     dt: h.dt,
     temp: Math.round(h.temp),
     description: h.weather[0]?.description ?? '',
     icon: h.weather[0]?.icon ?? '01d',
-    formattedTime:
-      idx === 0
-        ? 'Now'
-        : new Date(h.dt * 1000).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            hour12: true,
-          }),
   }));
 }

@@ -63,7 +63,5 @@ describe('weatherMapper utilities', () => {
     expect(result).toHaveLength(24);
     expect(result[0].temp).toBe(18);
     expect(result[0].icon).toBe('01d');
-    expect(result[0].formattedTime).toBe('Now');
-    expect(result[1].formattedTime).toMatch(/\d{1,2}\s?(AM|PM)/i);
   });
 });
