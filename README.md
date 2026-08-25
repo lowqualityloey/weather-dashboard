@@ -177,6 +177,35 @@ npm run test:watch
 
 ---
 
+## 🚀 Deployment (Cloudflare Workers)
+
+The app is deployed to Cloudflare Workers with static assets (`wrangler.jsonc`).
+`src/worker.ts` serves the built SPA and proxies `/api/weather/*` requests to
+OpenWeather so the API key is never exposed to the client.
+
+1. **Build the production bundle:**
+   ```bash
+   npm run build
+   ```
+
+2. **Set the server-side API key as a Worker secret** (required — without it the proxy
+   returns `500 OpenWeather API key is missing on the server`):
+   ```bash
+   npx wrangler secret put OPENWEATHER_API_KEY
+   ```
+
+3. **Deploy:**
+   ```bash
+   npx wrangler deploy
+   ```
+
+The app is available at `https://weather-dashboard.<your-subdomain>.workers.dev`.
+
+> Note: `functions/api/weather/[[path]].js` is the equivalent proxy for Cloudflare
+> **Pages** deployments and is not used by the Workers deployment.
+
+---
+
 ## 👤 Author
 
 **Jonell Balanay**
