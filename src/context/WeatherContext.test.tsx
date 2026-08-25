@@ -148,4 +148,107 @@ describe('WeatherContext request orchestration', () => {
     expect(saved[0].name).toBe('Auckland');
     expect(Number.isFinite(saved[0].lat)).toBe(false);
   });
+
+  describe('fetchCurrentLocation error handling', () => {
+    const setupGeolocationError = (code: number) => {
+      const mockObj = {
+        getCurrentPosition: vi.fn(
+          (
+            _success: (pos: unknown) => void,
+            error?: (err: {
+              code: number;
+              PERMISSION_DENIED: number;
+              POSITION_UNAVAILABLE: number;
+              TIMEOUT: number;
+            }) => void,
+          ) => {
+            if (error) {
+              error({
+                code,
+                PERMISSION_DENIED: 1,
+                POSITION_UNAVAILABLE: 2,
+                TIMEOUT: 3,
+              });
+            }
+          },
+        ),
+      };
+      vi.stubGlobal('navigator', {
+        ...globalThis.navigator,
+        geolocation: mockObj,
+      });
+    };
+
+    it('handles PERMISSION_DENIED error', async () => {
+      setupGeolocationError(1);
+      const { result } = renderHook(() => useWeather(), { wrapper });
+
+      act(() => {
+        result.current.fetchCurrentLocation();
+      });
+
+      expect(result.current.error).toBe(
+        'Location permission denied. Please allow location access or search manually.',
+      );
+    });
+
+    it('handles POSITION_UNAVAILABLE error', async () => {
+      setupGeolocationError(2);
+      const { result } = renderHook(() => useWeather(), { wrapper });
+
+      act(() => {
+        result.current.fetchCurrentLocation();
+      });
+
+      expect(result.current.error).toBe('Location information is unavailable.');
+    });
+
+    it('handles TIMEOUT error', async () => {
+      setupGeolocationError(3);
+      const { result } = renderHook(() => useWeather(), { wrapper });
+
+      act(() => {
+        result.current.fetchCurrentLocation();
+      });
+
+      expect(result.current.error).toBe('Location request timed out.');
+    });
+
+    it('handles default unknown error', async () => {
+      setupGeolocationError(99);
+      const { result } = renderHook(() => useWeather(), { wrapper });
+
+      act(() => {
+        result.current.fetchCurrentLocation();
+      });
+
+      expect(result.current.error).toBe('Failed to detect location.');
+    });
+  });
+
+  it('preserves user-safe error messages like "City not found"', async () => {
+    geocodeMock.mockResolvedValue([]);
+
+    const { result } = renderHook(() => useWeather(), { wrapper });
+
+    await act(async () => {
+      await result.current.searchCity('NonExistentCity12345');
+    });
+
+    expect(result.current.error).toBe('City not found');
+  });
+
+  it('sanitizes detailed or internal error messages to a safe generic message', async () => {
+    geocodeMock.mockRejectedValue(
+      new Error('Database error connecting to postgres://user:secret_pass@db.local:5432/weather'),
+    );
+
+    const { result } = renderHook(() => useWeather(), { wrapper });
+
+    await act(async () => {
+      await result.current.searchCity('London');
+    });
+
+    expect(result.current.error).toBe('Failed to fetch weather data. Please try again.');
+  });
 });

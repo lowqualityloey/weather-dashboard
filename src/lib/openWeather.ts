@@ -3,6 +3,27 @@ import type { GeoLocation, WeatherData, DailyWeather, HourlyWeather } from '../t
 
 const API_BASE = '/api/weather';
 
+const ALLOWED_HOSTS = new Set(['api.openweathermap.org']);
+
+export function sanitizeNextUrl(rawUrl: unknown): string | null {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return null;
+    }
+    if (!ALLOWED_HOSTS.has(parsed.hostname.toLowerCase())) {
+      return null;
+    }
+    parsed.protocol = 'https:';
+    parsed.username = '';
+    parsed.password = '';
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function geocodeCity(city: string): Promise<GeoLocation[]> {
   const cacheKey = `geocode_${city}`;
   const cached = getCache<GeoLocation[]>(cacheKey);
@@ -58,19 +79,21 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
   // Fetch page 2 if needed to provide a full 24 hours
   if (hourlyJson.next && hourlyItems.length < 24) {
     try {
-      const rawNextUrl = String(hourlyJson.next);
-      const nextUrl = rawNextUrl
-        .replace(/^https?:\/\/api\.openweathermap\.org/i, API_BASE)
-        .replace(/([?&])appid=[^&]*&?/, '$1')
-        .replace(/[?&]$/, '');
+      const sanitized = sanitizeNextUrl(hourlyJson.next);
+      if (sanitized) {
+        const nextUrl = sanitized
+          .replace(/^https?:\/\/api\.openweathermap\.org/i, API_BASE)
+          .replace(/([?&])appid=[^&]*&?/, '$1')
+          .replace(/[?&]$/, '');
 
-      const page2Res = await fetch(nextUrl);
-      if (page2Res.ok) {
-        const page2Json = await page2Res.json();
-        hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
+        const page2Res = await fetch(nextUrl);
+        if (page2Res.ok) {
+          const page2Json = await page2Res.json();
+          hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
+        }
       }
-    } catch {
-      // Fall back to page 1 items
+    } catch (err) {
+      console.warn('Failed to fetch page 2 hourly forecast, falling back to page 1 items:', err);
     }
   }
 
