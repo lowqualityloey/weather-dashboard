@@ -1,7 +1,41 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { geocodeCity, fetchWeather, reverseGeocode } from './openWeather';
+import { geocodeCity, fetchWeather, reverseGeocode, sanitizeNextUrl } from './openWeather';
 import { setCache, getCache } from './cache';
 import type { GeoLocation } from '../types/weather';
+
+describe('sanitizeNextUrl', () => {
+  it('returns https URL for valid OpenWeather http URL', () => {
+    const raw = 'http://api.openweathermap.org/data/4.0/onecall/timemachine?page=2';
+    const sanitized = sanitizeNextUrl(raw);
+    expect(sanitized).toBe('https://api.openweathermap.org/data/4.0/onecall/timemachine?page=2');
+  });
+
+  it('preserves valid OpenWeather https URL', () => {
+    const raw = 'https://api.openweathermap.org/data/4.0/onecall/timemachine?page=2';
+    const sanitized = sanitizeNextUrl(raw);
+    expect(sanitized).toBe('https://api.openweathermap.org/data/4.0/onecall/timemachine?page=2');
+  });
+
+  it('rejects untrusted domains', () => {
+    expect(sanitizeNextUrl('https://evil.com/data/4.0/onecall')).toBeNull();
+    expect(sanitizeNextUrl('http://attacker.org/phishing')).toBeNull();
+    expect(sanitizeNextUrl('https://api.openweathermap.org.evil.com/test')).toBeNull();
+  });
+
+  it('handles invalid or non-string inputs gracefully', () => {
+    expect(sanitizeNextUrl(null)).toBeNull();
+    expect(sanitizeNextUrl(undefined)).toBeNull();
+    expect(sanitizeNextUrl(123)).toBeNull();
+    expect(sanitizeNextUrl('not a url')).toBeNull();
+    expect(sanitizeNextUrl('javascript:alert(1)')).toBeNull();
+  });
+
+  it('strips credentials embedded in URL', () => {
+    const raw = 'https://user:pass@api.openweathermap.org/data/4.0/onecall';
+    const sanitized = sanitizeNextUrl(raw);
+    expect(sanitized).toBe('https://api.openweathermap.org/data/4.0/onecall');
+  });
+});
 
 describe('openWeather API module', () => {
   const mockFetch = vi.fn();
@@ -212,6 +246,27 @@ describe('openWeather API module', () => {
       expect(weather.hourly).toHaveLength(24);
       const page2FetchUrl = mockFetch.mock.calls[3][0] as string;
       expect(page2FetchUrl).toContain('https://api.openweathermap.org');
+    });
+
+    it('ignores page 2 fetch if next URL points to an untrusted host', async () => {
+      const page1Hourly = {
+        next: 'https://evil-malicious-site.com/exploit',
+        data: Array.from({ length: 10 }, (_, i) => ({
+          dt: 1700000000 + i * 3600,
+          temp: 15,
+          weather: [{ description: 'clear', icon: '01d' }],
+        })),
+      };
+
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: async () => currentResponseBody })
+        .mockResolvedValueOnce({ ok: true, json: async () => page1Hourly })
+        .mockResolvedValueOnce({ ok: true, json: async () => dailyResponseBody });
+
+      const weather = await fetchWeather(lat, lon);
+
+      expect(weather.hourly).toHaveLength(10);
+      expect(mockFetch).not.toHaveBeenCalledWith('https://evil-malicious-site.com/exploit');
     });
 
     it('throws error when current weather request fails', async () => {

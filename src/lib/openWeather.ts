@@ -6,6 +6,27 @@ const API_KEY = env.OPENWEATHER_API_KEY;
 const GEO_BASE = 'https://api.openweathermap.org/geo/1.0';
 const ONECALL_4_BASE = 'https://api.openweathermap.org/data/4.0/onecall';
 
+const ALLOWED_HOSTS = new Set(['api.openweathermap.org']);
+
+export function sanitizeNextUrl(rawUrl: unknown): string | null {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return null;
+    }
+    if (!ALLOWED_HOSTS.has(parsed.hostname.toLowerCase())) {
+      return null;
+    }
+    parsed.protocol = 'https:';
+    parsed.username = '';
+    parsed.password = '';
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function geocodeCity(city: string): Promise<GeoLocation[]> {
   const cacheKey = `geocode_${city}`;
   const cached = getCache<GeoLocation[]>(cacheKey);
@@ -63,11 +84,13 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
   // Fetch page 2 if needed to provide a full 24 hours
   if (hourlyJson.next && hourlyItems.length < 24) {
     try {
-      const nextUrl = String(hourlyJson.next).replace(/^http:\/\//i, 'https://');
-      const page2Res = await fetch(nextUrl);
-      if (page2Res.ok) {
-        const page2Json = await page2Res.json();
-        hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
+      const nextUrl = sanitizeNextUrl(hourlyJson.next);
+      if (nextUrl) {
+        const page2Res = await fetch(nextUrl);
+        if (page2Res.ok) {
+          const page2Json = await page2Res.json();
+          hourlyItems = [...hourlyItems, ...((page2Json.data as HourlyItem[]) ?? [])];
+        }
       }
     } catch (err) {
       console.warn('Failed to fetch page 2 hourly forecast, falling back to page 1 items:', err);
