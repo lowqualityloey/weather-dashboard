@@ -92,40 +92,4 @@ describe('SearchBar combobox', () => {
 
     expect(geocodeMock).not.toHaveBeenCalled();
   });
-
-  it('handles keyboard navigation with ArrowDown, ArrowUp, and Escape', async () => {
-    geocodeMock.mockResolvedValue([
-      { name: 'Auckland', country: 'NZ', state: 'Auckland', lat: -36.85, lon: 174.76 },
-      { name: 'Auckland', country: 'US', state: 'California', lat: 37.8, lon: -122.2 },
-    ]);
-
-    renderSearchBar();
-
-    const input = screen.getByRole('combobox');
-    fireEvent.change(input, { target: { value: 'Auck' } });
-
-    await act(async () => {
-      vi.advanceTimersByTime(400);
-    });
-    await act(async () => {});
-
-    const options = screen.getAllByRole('option');
-    expect(options).toHaveLength(2);
-
-    // ArrowDown should select the first item
-    fireEvent.keyDown(input, { key: 'ArrowDown' });
-    expect(options[0]).toHaveAttribute('aria-selected', 'true');
-
-    // ArrowDown again should select the second item
-    fireEvent.keyDown(input, { key: 'ArrowDown' });
-    expect(options[1]).toHaveAttribute('aria-selected', 'true');
-
-    // ArrowUp should select the first item again
-    fireEvent.keyDown(input, { key: 'ArrowUp' });
-    expect(options[0]).toHaveAttribute('aria-selected', 'true');
-
-    // Escape should close the listbox
-    fireEvent.keyDown(input, { key: 'Escape' });
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
 });

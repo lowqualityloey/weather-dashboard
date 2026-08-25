@@ -33,13 +33,12 @@ export default function ForecastList({ daily, hourly = [] }: ForecastListProps) 
                   className="flex flex-col items-center shrink-0 min-w-16 p-2 rounded-xl hover:bg-muted/60 transition-colors space-y-1.5"
                 >
                   <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                    {h.formattedTime ??
-                      (idx === 0
-                        ? 'Now'
-                        : new Date(h.dt * 1000).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            hour12: true,
-                          }))}
+                    {idx === 0
+                      ? 'Now'
+                      : new Date(h.dt * 1000).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          hour12: true,
+                        })}
                   </span>
                   <img
                     src={getIconUrl(h.icon)}
