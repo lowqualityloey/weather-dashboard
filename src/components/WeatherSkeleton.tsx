@@ -28,7 +28,7 @@ export function WeatherSkeleton() {
       <Card className="bg-muted/30 border-border p-4 space-y-4">
         <div className="h-4 w-36 bg-muted rounded-md" />
         <div className="flex gap-3 overflow-hidden">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center space-y-2 shrink-0 min-w-16 p-2">
               <div className="h-3 w-8 bg-muted rounded-sm" />
               <div className="h-8 w-8 bg-muted rounded-full" />
@@ -42,7 +42,7 @@ export function WeatherSkeleton() {
       <div className="space-y-3">
         <div className="h-4 w-32 bg-muted rounded-md" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <Card
               key={i}
               className="bg-muted/30 border-border p-4 flex flex-col items-center space-y-3"
