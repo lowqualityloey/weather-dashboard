@@ -42,6 +42,7 @@ describe('openWeather API module', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     mockFetch.mockReset();
     vi.stubGlobal('fetch', mockFetch);
   });
@@ -83,6 +84,7 @@ describe('openWeather API module', () => {
       );
       expect(result).toEqual(mockLocations);
 
+      // Verify cached entry was created
       const cached = getCache<GeoLocation[]>('geocode_Auckland');
       expect(cached).toEqual(mockLocations);
     });
@@ -274,6 +276,24 @@ describe('openWeather API module', () => {
         .mockResolvedValueOnce({ ok: true, json: async () => dailyResponseBody });
 
       await expect(fetchWeather(lat, lon)).rejects.toThrow('Current weather request failed');
+    });
+
+    it('throws error when hourly timeline request fails', async () => {
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: async () => currentResponseBody })
+        .mockResolvedValueOnce({ ok: false, status: 500 })
+        .mockResolvedValueOnce({ ok: true, json: async () => dailyResponseBody });
+
+      await expect(fetchWeather(lat, lon)).rejects.toThrow('Hourly timeline request failed');
+    });
+
+    it('throws error when daily timeline request fails', async () => {
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: async () => currentResponseBody })
+        .mockResolvedValueOnce({ ok: true, json: async () => hourlyResponseBody })
+        .mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(fetchWeather(lat, lon)).rejects.toThrow('Daily timeline request failed');
     });
 
     it('throws error when no weather data is returned in current response', async () => {
