@@ -149,6 +149,20 @@ describe('WeatherContext request orchestration', () => {
     expect(Number.isFinite(saved[0].lat)).toBe(false);
   });
 
+  it('maintains savedCities reference equality across re-renders when storage is unchanged', () => {
+    const { result, rerender } = renderHook(() => useWeather(), { wrapper });
+
+    const initialSavedCities = result.current.savedCities;
+
+    // Trigger re-render by calling a state setter that doesn't touch savedCities
+    act(() => {
+      result.current.clearError();
+    });
+    rerender();
+
+    expect(result.current.savedCities).toBe(initialSavedCities);
+  });
+
   describe('fetchCurrentLocation error handling', () => {
     const setupGeolocationError = (code: number) => {
       const mockObj = {
