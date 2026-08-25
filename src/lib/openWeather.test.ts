@@ -44,7 +44,9 @@ describe('openWeather API module', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const fetchUrl = mockFetch.mock.calls[0][0] as string;
-      expect(fetchUrl).toContain('https://api.openweathermap.org/geo/1.0/direct?q=Auckland&limit=5&appid=');
+      expect(fetchUrl).toContain(
+        'https://api.openweathermap.org/geo/1.0/direct?q=Auckland&limit=5&appid=',
+      );
       expect(result).toEqual(mockLocations);
 
       // Verify cached entry was created
