@@ -22,18 +22,13 @@ export default {
   },
 };
 
-export async function proxyWeatherRequest(
-  request: Request,
-  env: Env,
-  url: URL,
-): Promise<Response> {
+export async function proxyWeatherRequest(request: Request, env: Env, url: URL): Promise<Response> {
   const apiKey = env.OPENWEATHER_API_KEY || env.VITE_OPENWEATHER_API_KEY;
 
   if (!apiKey) {
     return jsonResponse(
       {
-        error:
-          'OpenWeather API key is missing on the server. Please set OPENWEATHER_API_KEY.',
+        error: 'OpenWeather API key is missing on the server. Please set OPENWEATHER_API_KEY.',
       },
       500,
     );

@@ -184,12 +184,14 @@ The app is deployed to Cloudflare Workers with static assets (`wrangler.jsonc`).
 OpenWeather so the API key is never exposed to the client.
 
 1. **Build the production bundle:**
+
    ```bash
    npm run build
    ```
 
 2. **Set the server-side API key as a Worker secret** (required — without it the proxy
    returns `500 OpenWeather API key is missing on the server`):
+
    ```bash
    npx wrangler secret put OPENWEATHER_API_KEY
    ```
