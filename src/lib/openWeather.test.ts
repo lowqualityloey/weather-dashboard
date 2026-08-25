@@ -73,9 +73,7 @@ describe('openWeather API functions', () => {
       };
 
       const mockHourlyData = {
-        data: [
-          { dt: 1600000000, temp: 18, weather: [{ description: 'clear sky', icon: '01d' }] },
-        ],
+        data: [{ dt: 1600000000, temp: 18, weather: [{ description: 'clear sky', icon: '01d' }] }],
       };
 
       const mockDailyData = {
@@ -187,9 +185,9 @@ describe('openWeather API functions', () => {
 
     it('returns geocoded locations and caches result', async () => {
       const mockGeo = [{ name: 'Auckland', lat: -36.85, lon: 174.76, country: 'NZ' }];
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(mockGeo), { status: 200 }),
-      );
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(new Response(JSON.stringify(mockGeo), { status: 200 }));
 
       const res1 = await geocodeCity('Auckland');
       expect(res1).toEqual(mockGeo);
@@ -211,9 +209,9 @@ describe('openWeather API functions', () => {
 
     it('returns location name or default "Current Location" and caches result', async () => {
       const mockGeo = [{ name: 'Taupo', lat: -38.68, lon: 176.07, country: 'NZ' }];
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(mockGeo), { status: 200 }),
-      );
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(new Response(JSON.stringify(mockGeo), { status: 200 }));
 
       const name = await reverseGeocode(-38.68, 176.07);
       expect(name).toBe('Taupo');
