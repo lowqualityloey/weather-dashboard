@@ -1,10 +1,7 @@
-import { env } from './env';
 import { getCache, setCache } from './cache';
 import type { GeoLocation, WeatherData, DailyWeather, HourlyWeather } from '../types/weather';
 
-const API_KEY = env.OPENWEATHER_API_KEY;
-const GEO_BASE = 'https://api.openweathermap.org/geo/1.0';
-const ONECALL_4_BASE = 'https://api.openweathermap.org/data/4.0/onecall';
+const API_BASE = '/api/weather';
 
 const ALLOWED_HOSTS = new Set(['api.openweathermap.org']);
 
@@ -32,9 +29,7 @@ export async function geocodeCity(city: string): Promise<GeoLocation[]> {
   const cached = getCache<GeoLocation[]>(cacheKey);
   if (cached) return cached;
 
-  const res = await fetch(
-    `${GEO_BASE}/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`,
-  );
+  const res = await fetch(`${API_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5`);
   if (!res.ok) throw new Error('Geocoding request failed');
   const data: GeoLocation[] = await res.json();
 
@@ -48,9 +43,9 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
   if (cached) return cached;
 
   const [currentRes, hourlyRes, dailyRes] = await Promise.all([
-    fetch(`${ONECALL_4_BASE}/current?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
-    fetch(`${ONECALL_4_BASE}/timeline/1h?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
-    fetch(`${ONECALL_4_BASE}/timeline/1day?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`),
+    fetch(`${API_BASE}/data/4.0/onecall/current?lat=${lat}&lon=${lon}&units=metric`),
+    fetch(`${API_BASE}/data/4.0/onecall/timeline/1h?lat=${lat}&lon=${lon}&units=metric`),
+    fetch(`${API_BASE}/data/4.0/onecall/timeline/1day?lat=${lat}&lon=${lon}&units=metric`),
   ]);
 
   if (!currentRes.ok) throw new Error('Current weather request failed');
@@ -84,8 +79,13 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
   // Fetch page 2 if needed to provide a full 24 hours
   if (hourlyJson.next && hourlyItems.length < 24) {
     try {
-      const nextUrl = sanitizeNextUrl(hourlyJson.next);
-      if (nextUrl) {
+      const sanitized = sanitizeNextUrl(hourlyJson.next);
+      if (sanitized) {
+        const nextUrl = sanitized
+          .replace(/^https?:\/\/api\.openweathermap\.org/i, API_BASE)
+          .replace(/([?&])appid=[^&]*&?/, '$1')
+          .replace(/[?&]$/, '');
+
         const page2Res = await fetch(nextUrl);
         if (page2Res.ok) {
           const page2Json = await page2Res.json();
@@ -137,7 +137,7 @@ export async function reverseGeocode(lat: number, lon: number): Promise<string> 
   const cached = getCache<string>(cacheKey);
   if (cached) return cached;
 
-  const res = await fetch(`${GEO_BASE}/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`);
+  const res = await fetch(`${API_BASE}/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1`);
   if (!res.ok) throw new Error('Reverse geocoding request failed');
   const data: GeoLocation[] = await res.json();
 
