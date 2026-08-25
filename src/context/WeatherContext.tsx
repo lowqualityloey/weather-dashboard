@@ -113,7 +113,13 @@ export function WeatherProvider({ children }: { children: ReactNode }) {
       applyWeather(name, location, weather);
     } catch (err: unknown) {
       if (id !== requestRef.current) return;
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      const SAFE_ERRORS = new Set(['City not found']);
+      const rawMessage = err instanceof Error ? err.message : '';
+      if (SAFE_ERRORS.has(rawMessage)) {
+        setError(rawMessage);
+      } else {
+        setError('Failed to fetch weather data. Please try again.');
+      }
     } finally {
       if (id === requestRef.current) setIsLoading(false);
     }
