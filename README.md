@@ -4,6 +4,22 @@ A high-performance, responsive Progressive Web App (PWA) built with React 19, Ty
 
 ---
 
+## 📸 Previews & Interface
+
+### 🖥️ Desktop Experience (Light & Dark Mode)
+
+![SkyPulse Desktop Preview](docs/screenshots/desktop-preview.jpeg)
+
+_Side-by-side desktop interface preview showcasing light and dark themes, real-time metrics for Manila, the 24-hour hourly forecast carousel, 5-day extended outlook, and the persistent saved cities sidebar._
+
+### 📱 Mobile Experience & Responsive Navigation
+
+![SkyPulse Mobile Preview](docs/screenshots/mobile-preview.png)
+
+_Mobile PWA responsive views featuring light mode, dark mode, and the slide-over navigation drawer (`MobileNav.tsx`) for managing saved cities on touch devices._
+
+---
+
 ## 🚀 Key Features
 
 ### 🔍 Search & Geolocation
@@ -155,9 +171,11 @@ npm run test:watch
    ```
 
 4. **Start the Local Development Server:**
+
    ```bash
    npm run dev
    ```
+
    Open `http://localhost:5173` in your browser.
 
 ---
@@ -197,6 +215,7 @@ OpenWeather so the API key is never exposed to the client.
    ```
 
 3. **Deploy:**
+
    ```bash
    npx wrangler deploy
    ```
