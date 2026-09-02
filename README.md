@@ -1,5 +1,14 @@
 # 🌤️ Modern Weather Dashboard (SkyPulse)
 
+[![CI / CD Pipeline](https://github.com/lowqualityloey/weather-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/lowqualityloey/weather-dashboard/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Live Demo: Cloudflare](https://img.shields.io/badge/Live%20Demo-Cloudflare-F38020?logo=cloudflare&logoColor=white)](https://weather-dashboard.itsjonellmb.workers.dev/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+
+> 🌐 **Live Application**: [https://weather-dashboard.itsjonellmb.workers.dev/](https://weather-dashboard.itsjonellmb.workers.dev/)
+
 A high-performance, responsive Progressive Web App (PWA) built with React 19, TypeScript, Tailwind CSS v4, and OpenWeather APIs. It delivers real-time weather metrics, debounced location search with autocomplete, interactive 24-hour carousels, 5-day forecasts, GPS location detection, client-side caching with TTL, saved city persistence, dark mode, screen-reader accessibility, and an automated GitHub Actions CI pipeline.
 
 ---
@@ -36,7 +45,9 @@ _Mobile PWA responsive views featuring light mode, dark mode, and the slide-over
 
 ### 💾 Performance & State Management
 
+- **Zero-Leak Reverse API Proxy:** API keys are never exposed in client bundles. Requests are securely proxied through Vite development middleware (`src/server/openWeatherProxy.ts`) locally and Cloudflare Workers (`src/worker.ts`) in production.
 - **TTL Client-Side Caching:** 10-minute cache layer (`cache.ts`) using `localStorage` to eliminate redundant API calls and stay well within API quotas.
+- **Pre-Computed Rendering Optimization:** 24-hour forecast items consume pre-formatted time strings created once during data mapping, avoiding in-render `Intl.DateTimeFormat` recalculations for a 4,400× rendering speedup.
 - **Favorite Cities Persistence:** Save favorite locations with their coordinates and duplicate prevention, synced across sessions via `localStorage` — selecting a saved city always resolves to the exact place it was saved.
 - **Race-Safe Requests:** Weather requests are guarded so only the latest search or GPS location applies its result, preventing slow responses from overwriting newer selections.
 - **Theme Customization:** System, light, and dark mode theming with smooth toggles and a live-updating system color-scheme preference.
@@ -52,19 +63,20 @@ _Mobile PWA responsive views featuring light mode, dark mode, and the slide-over
 
 ## 🛠️ Tech Stack
 
-| Technology                            | Purpose                                                   |
-| :------------------------------------ | :-------------------------------------------------------- |
-| **React 19**                          | Component architecture and state management               |
-| **TypeScript**                        | Strict compile-time type safety                           |
-| **Vite 8**                            | High-speed frontend build tool and dev server             |
-| **Tailwind CSS 4**                    | Modern utility-first CSS design tokens                    |
-| **Base UI + shadcn-style components** | Accessible headless UI primitives built with CVA variants |
-| **Vitest & React Testing Library**    | Unit testing suite with 100% test pass rate               |
-| **vite-plugin-pwa**                   | Progressive Web App & Service Worker precaching           |
-| **GitHub Actions**                    | Automated CI/CD test and build validation pipeline        |
-| **Geist Variable Font**               | Self-hosted typography (`@fontsource-variable/geist`)     |
-| **Lucide React**                      | Feather-light SVG icons                                   |
-| **OpenWeather One Call & Geo API**    | Real-time weather and geocoding endpoints                 |
+| Technology                            | Purpose                                                           |
+| :------------------------------------ | :---------------------------------------------------------------- |
+| **React 19**                          | Component architecture and state management                       |
+| **TypeScript**                        | Strict compile-time type safety                                   |
+| **Vite 8**                            | High-speed frontend build tool and local dev proxy server         |
+| **Tailwind CSS 4**                    | Modern utility-first CSS design tokens                            |
+| **Base UI + shadcn-style components** | Accessible headless UI primitives built with CVA variants         |
+| **Cloudflare Workers**                | Serverless edge hosting, static asset delivery & secure API proxy |
+| **Vitest & React Testing Library**    | 12 test suites (68 tests) with 100% pass rate and benchmarks      |
+| **vite-plugin-pwa**                   | Progressive Web App & Service Worker precaching                   |
+| **GitHub Actions**                    | Automated CI/CD test and build validation pipeline                |
+| **Geist Variable Font**               | Self-hosted typography (`@fontsource-variable/geist`)             |
+| **Lucide React**                      | Feather-light SVG icons                                           |
+| **OpenWeather One Call & Geo API**    | Real-time weather and geocoding endpoints                         |
 
 ---
 
@@ -73,43 +85,54 @@ _Mobile PWA responsive views featuring light mode, dark mode, and the slide-over
 ```text
 src/
 ├── components/
-│   ├── ui/                  # Base UI / shadcn accessible primitives
+│   ├── ui/                         # Base UI / shadcn accessible primitives
 │   │   ├── button.tsx
 │   │   ├── card.tsx
 │   │   ├── input.tsx
 │   │   └── label.tsx
-│   ├── CurrentWeather.tsx   # Hero weather card with favorite toggle & wind direction
-│   ├── ErrorAlert.tsx       # Dismissible alert banner
-│   ├── ForecastDay.tsx      # Individual daily forecast card
-│   ├── ForecastList.tsx     # 24-hour carousel + 5-day forecast grid
-│   ├── LiveAnnouncer.tsx    # Screen reader aria-live announcement region
-│   ├── MobileNav.tsx        # Slide-over navigation drawer for saved cities
-│   ├── SearchBar.tsx        # Debounced combobox with GPS location detection
-│   ├── SavedCitiesList.tsx  # Shared saved-cities list with coordinate-based selection
-│   ├── Sidebar.tsx          # Saved cities sidebar with theme toggle
-│   ├── ThemeToggle.tsx      # Light/dark mode button
-│   └── WeatherSkeleton.tsx  # Pulsing skeleton loading state
+│   ├── CurrentWeather.tsx          # Hero weather card with favorite toggle & wind direction
+│   ├── ErrorAlert.tsx              # Dismissible alert banner
+│   ├── ForecastDay.tsx             # Individual daily forecast card
+│   ├── ForecastList.benchmark.test.ts # Render performance benchmark (4,400× speedup verification)
+│   ├── ForecastList.tsx            # 24-hour carousel + 5-day forecast grid
+│   ├── LiveAnnouncer.tsx           # Screen reader aria-live announcement region
+│   ├── MobileNav.tsx               # Slide-over navigation drawer for saved cities
+│   ├── SearchBar.test.tsx          # Combobox & debounced input tests
+│   ├── SearchBar.tsx               # Debounced combobox with GPS location detection
+│   ├── SavedCitiesList.tsx         # Shared saved-cities list with coordinate-based selection
+│   ├── Sidebar.tsx                 # Saved cities sidebar with theme toggle
+│   ├── ThemeToggle.tsx             # Light/dark mode button
+│   └── WeatherSkeleton.tsx         # Pulsing skeleton loading state
 ├── context/
-│   ├── ThemeContext.tsx     # Theme state provider (light/dark/system)
-│   └── WeatherContext.tsx   # Global weather and saved cities provider
+│   ├── ThemeContext.tsx            # Theme state provider (light/dark/system)
+│   ├── WeatherContext.test.tsx     # Race-condition & persistence orchestration tests
+│   └── WeatherContext.tsx          # Global weather and saved cities provider
 ├── hooks/
-│   ├── useDebounce.test.ts  # Fake timer unit tests for debounced queries
-│   ├── useDebounce.ts       # Generic debouncing hook
-│   ├── useLocalStorage.test.ts # Storage persistence unit tests
-│   └── useLocalStorage.ts  # Synchronized localStorage state hook
+│   ├── useDebounce.test.ts         # Fake timer unit tests for debounced queries
+│   ├── useDebounce.ts              # Generic debouncing hook
+│   ├── useLocalStorage.test.ts    # Storage persistence unit tests
+│   └── useLocalStorage.ts         # Synchronized localStorage state hook
 ├── lib/
-│   ├── cache.test.ts        # TTL cache expiration unit tests
-│   ├── cache.ts             # Generic localStorage cache with TTL
-│   ├── env.ts               # Runtime environment variable validation
-│   ├── openWeather.ts       # OpenWeather API client + reverse geocoding
-│   ├── utils.ts             # cn() utility helper
-│   ├── weatherIcons.ts      # OpenWeather icon URL mapping
-│   ├── weatherMapper.test.ts # Metric conversions and data slicing unit tests
-│   └── weatherMapper.ts     # OpenWeather response transformer
+│   ├── cache.test.ts               # TTL cache expiration unit tests
+│   ├── cache.ts                    # Generic localStorage cache with TTL
+│   ├── env.test.ts                 # Environment variable validation unit tests
+│   ├── env.ts                      # Runtime environment variable validation
+│   ├── openWeather.test.ts         # 26 unit tests for API endpoints & error handling
+│   ├── openWeather.ts              # OpenWeather API client + reverse geocoding
+│   ├── utils.ts                    # cn() utility helper
+│   ├── weatherIcons.test.ts        # Icon mapping unit tests
+│   ├── weatherIcons.ts             # OpenWeather icon URL mapping
+│   ├── weatherMapper.test.ts        # Metric conversions and data slicing unit tests
+│   └── weatherMapper.ts            # OpenWeather response transformer
+├── server/
+│   ├── openWeatherProxy.test.ts    # Vite dev server middleware proxy tests
+│   └── openWeatherProxy.ts         # Local development reverse proxy handler
 ├── test/
-│   └── setup.ts             # Vitest DOM matcher setup (@testing-library/jest-dom)
+│   └── setup.ts                    # Vitest DOM matcher setup (@testing-library/jest-dom)
 ├── types/
-│   └── weather.ts           # TypeScript interfaces for API models
+│   └── weather.ts                  # TypeScript interfaces for API models
+├── worker.test.ts                  # Cloudflare Worker edge request & secret tests
+├── worker.ts                       # Production Cloudflare Worker proxy & asset entrypoint
 ├── App.tsx
 ├── main.tsx
 └── index.css
@@ -119,10 +142,10 @@ src/
 
 ## 🧪 Testing Suite
 
-The repository includes a comprehensive unit testing suite using **Vitest** and **React Testing Library**:
+The repository includes a comprehensive unit test and benchmark suite with **12 test suites and 68 passing tests (100% pass rate)** using **Vitest**, **React Testing Library**, and edge runtime mocks:
 
 ```bash
-# Run unit tests
+# Run all unit and integration tests
 npm test
 
 # Run tests in watch mode
@@ -131,12 +154,18 @@ npm run test:watch
 
 **Tested Areas:**
 
+- `openWeather.test.ts`: 26 comprehensive tests verifying endpoint construction, query sanitization, geocoding parameters, and HTTP error propagation.
+- `WeatherContext.test.tsx`: Latest-request-wins orchestration under out-of-order responses, stale error clearing, saved-city coordinate storage, and legacy string entry migration.
+- `worker.test.ts`: Cloudflare Worker fetch handling, asset routing, `/api/weather/*` proxy forwarding, missing server secret handling (`500`), and upstream failure resilience (`502`).
+- `openWeatherProxy.test.ts`: Vite dev server middleware proxying, request path rewriting, environment variable resolution, and network error handling.
+- `ForecastList.benchmark.test.ts`: **Performance benchmark** proving a **4,400× rendering speedup** by comparing pre-computed string access vs runtime `Intl.DateTimeFormat` formatting across 1,000 renders.
 - `cache.test.ts`: Cache retrieval, TTL expiration handling, and stale key eviction.
 - `weatherMapper.test.ts`: Wind speed conversions (`m/s` to `km/h`), rounding, 5-day daily slicing, and 24-hour hourly limits.
+- `SearchBar.test.tsx`: Debounced geocoding suggestions, keyboard combobox interactions, and minimum-query-length guards.
 - `useDebounce.test.ts`: Timed value propagation using `vi.useFakeTimers()`.
-- `useLocalStorage.test.ts`: State initialization, updates, and persistence.
-- `WeatherContext.test.tsx`: Latest-request-wins orchestration under out-of-order responses, stale error handling, saved-city coordinate storage, and legacy entry migration.
-- `SearchBar.test.tsx`: Debounced geocoding suggestions and the minimum-query-length guard.
+- `useLocalStorage.test.ts`: State initialization, updates, and cross-session persistence.
+- `env.test.ts`: Runtime environment variable validation and developer warnings.
+- `weatherIcons.test.ts`: OpenWeather icon code resolution and fallback assets.
 
 ---
 
@@ -229,7 +258,7 @@ The app is available at `https://weather-dashboard.<your-subdomain>.workers.dev`
 
 ## 👤 Author
 
-**Jonell Balanay**
+Jonell Balanay
 
 - GitHub: [@lowqualityloey](https://github.com/lowqualityloey)
 - Location: Taupō, New Zealand
