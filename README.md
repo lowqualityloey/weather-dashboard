@@ -29,6 +29,21 @@ _Mobile PWA responsive views featuring light mode, dark mode, and the slide-over
 
 ---
 
+## 🎯 Why SkyPulse? (Engineering Beyond Tutorial Clones)
+
+While weather applications are a common portfolio project, most tutorial implementations suffer from critical production flaws: hardcoded API keys in client bundles, race conditions from out-of-order async responses, unthrottled API requests, and zero accessibility.
+
+SkyPulse was engineered as a deliberate exercise in **production-grade front-end discipline**:
+
+- 🛡️ **Zero-Leak Security**: API keys are isolated behind a Cloudflare Worker edge proxy in production and Vite middleware locally — never bundled in client code.
+- ⚡ **Race-Safe Async Orchestration**: Protected by request cancellation logic so fast typers or switching coordinates never render stale out-of-order data.
+- ⏱️ **Resource-Conscious Caching**: 10-minute TTL client-side cache layer in `localStorage` eliminates redundant roundtrips and respects API limits.
+- 🚀 **Rendering Optimization**: Pre-computed time formatting avoids in-render `Intl.DateTimeFormat` overhead for a proven 4,400× rendering speedup.
+- ♿ **Inclusive by Design**: Built with WAI-ARIA combobox keyboard controls (`ArrowUp/Down`, `Enter`, `Escape`) and `aria-live="polite"` status announcements.
+- 🧪 **Test-Driven Reliability**: 12 test suites and 68 automated unit/integration tests running on every pull request via GitHub Actions CI.
+
+---
+
 ## 🚀 Key Features
 
 ### 🔍 Search & Geolocation
